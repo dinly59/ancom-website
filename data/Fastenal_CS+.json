@@ -1,0 +1,50 @@
+{
+  "name": "CS+",
+  "company": "Fastenal",
+  "anchorSizes": [
+    {
+      "value": "3/16\"",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 1.28,
+          "Drill Bit Diameter": "5/32\"",
+          "Nominal Embedment Depth (hnom)": 1.75,
+          "Minimum Hole Depth (hhole)": 2,
+          "Cracked Concrete Data": false,
+          "Seismic Categories": "A-B",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 1130,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 1130,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": null,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": 659,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Shear Steel Strength (φVsa)": null,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 1216,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": null
+        }
+      ]
+    },
+    {
+      "value": "1/4\"",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 1.23,
+          "Drill Bit Diameter": "3/16\"",
+          "Nominal Embedment Depth (hnom)": 1.75,
+          "Minimum Hole Depth (hhole)": 2,
+          "Cracked Concrete Data": false,
+          "Seismic Categories": "A-B",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 1869,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 1064,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": null,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": 911,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Shear Steel Strength (φVsa)": null,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 1146,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "name": "PAT",
+  "company": "Prospect",
+  "anchorSizes": [
+    {
+      "value": "3/8\"",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 4.25,
+          "Drill Bit Diameter": "5/8\"",
+          "Nominal Embedment Depth (hnom)": 4.75,
+          "Minimum Hole Depth (hhole)": 4.75,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 3334,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 6834,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 4841,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Shear Steel Strength (φVsa)": 1732,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 14719,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 10426
+        }
+      ]
+    },
+    {
+      "value": "1/2\"",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 6,
+          "Drill Bit Diameter": "3/4\"",
+          "Nominal Embedment Depth (hnom)": 6.5,
+          "Minimum Hole Depth (hhole)": 6.5,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 2,
+          "Tension Steel Strength (φNsa)": 6068,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 11464,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 8120,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Shear Steel Strength (φVsa)": 3156,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 24691,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 17489
+        }
+      ]
+    }
+  ]
+}

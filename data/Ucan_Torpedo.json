@@ -1,0 +1,50 @@
+{
+  "name": "Torpedo",
+  "company": "Ucan",
+  "anchorSizes": [
+    {
+      "value": "3/8\"",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 2.3,
+          "Drill Bit Diameter": "3/8\"",
+          "Nominal Embedment Depth (hnom)": 3,
+          "Minimum Hole Depth (hhole)": 3.25,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 8369,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 3061,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 1927,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Shear Steel Strength (φVsa)": 3310,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 3296,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 2075
+        }
+      ]
+    },
+    {
+      "value": "1/2\"",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 2.28,
+          "Drill Bit Diameter": "1/2\"",
+          "Nominal Embedment Depth (hnom)": 3,
+          "Minimum Hole Depth (hhole)": 3.25,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 15681,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 3021,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 1902,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Shear Steel Strength (φVsa)": 3942,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 3253,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 2048
+        }
+      ]
+    }
+  ]
+}

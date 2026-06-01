@@ -1,0 +1,199 @@
+/* Custom styles to complement Tailwind */
+
+/* Navigation */
+.nav-link {
+  @apply px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors flex items-center gap-2 font-medium;
+}
+
+.nav-link.active {
+  @apply bg-blue-100 text-blue-700;
+}
+
+/* View pages */
+.view-page {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading {
+  @apply text-center py-16 text-slate-500 text-lg animate-pulse;
+}
+
+.error {
+  @apply text-center py-16 text-red-600;
+}
+
+.error button {
+  @apply mt-4 px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors;
+}
+
+.row-count {
+  @apply text-slate-600 text-sm px-6 py-3 bg-slate-50 border-b border-slate-200 font-medium;
+}
+
+.pagination { @apply flex items-center gap-2 px-6 py-3 bg-white border-t border-slate-200; }
+.pagination button { @apply px-3 py-1 bg-slate-100 rounded hover:bg-slate-200; }
+.pagination #pageInfo { @apply text-sm text-slate-600; }
+
+/* Table styles */
+#tableContainer h2 {
+  @apply text-2xl font-bold text-slate-800 px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-slate-50;
+}
+
+#tableContainer table {
+  @apply w-full border-collapse;
+  min-width: 100%;
+  margin: 0 auto;
+  table-layout: fixed;
+  border: 2px solid #cbd5e1;
+}
+
+/* horizontal scroll wrapper */
+.table-scroll { 
+  overflow-x: auto;
+  width: 100%;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+#tableContainer {
+  @apply mx-auto;
+}
+
+/* compact mode */
+.compact #tableContainer td, .compact #tableContainer th {
+  @apply px-2 py-2 text-xs;
+}
+
+
+#tableContainer th {
+  @apply px-4 py-3 text-center text-xs font-semibold text-slate-700 bg-slate-100 uppercase tracking-wider cursor-pointer hover:bg-slate-200 transition-colors sticky top-0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid #cbd5e1;
+}
+
+#tableContainer th:hover {
+  @apply bg-blue-50;
+}
+
+#tableContainer td {
+  @apply px-4 py-3 text-sm text-slate-700 text-center;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 2px solid #e2e8f0;
+}
+
+#tableContainer tbody tr {
+  @apply hover:bg-blue-50 transition-colors;
+}
+
+#tableContainer tbody tr:nth-child(even) {
+  @apply bg-slate-50;
+}
+
+/* Mobile responsive table */
+@media (max-width: 768px) {
+  #tableContainer table,
+  #tableContainer thead,
+  #tableContainer tbody,
+  #tableContainer th,
+  #tableContainer td,
+  #tableContainer tr {
+    @apply block;
+  }
+
+  #tableContainer thead tr {
+    @apply hidden;
+  }
+
+  #tableContainer tr {
+    @apply mb-4 border border-slate-200 rounded-lg shadow-sm overflow-hidden;
+  }
+
+  #tableContainer td {
+    @apply flex flex-col justify-center items-center px-4 py-3 border-b border-slate-100;
+    position: relative;
+    padding-left: 12px;
+    /* allow wrapping on mobile stacked view */
+    white-space: normal;
+  }
+
+  #tableContainer td::before {
+    content: attr(data-label);
+    @apply absolute left-1/2 transform -translate-x-1/2 -translate-y-4 font-semibold text-slate-600 text-xs uppercase;
+    top: 8px;
+    white-space: nowrap;
+  }
+
+  #tableContainer td:last-child {
+    @apply border-b-0;
+  }
+}
+
+#tableContainer th,
+#tableContainer td {
+  text-align: center !important;
+}
+
+/* Transposed table styles */
+#tableContainer th.metric-header {
+  @apply bg-blue-100 text-blue-900 font-bold text-left;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  border: 2px solid #cbd5e1;
+  border-right: 2px solid #cbd5e1;
+}
+
+#tableContainer td.metric-label {
+  @apply bg-slate-100 font-semibold text-slate-800 text-left;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  border: 2px solid #e2e8f0;
+  border-right: 2px solid #cbd5e1; line-height: 1.8;
+}
+
+/* Subscript styling in metric labels */
+#tableContainer td.metric-label sub {
+  font-size: 0.5em;
+  vertical-align: sub;
+}
+
+/* Company and product headers with colspan */
+#tableContainer thead tr:first-child th:not(.metric-header) {
+  @apply bg-blue-600 text-white font-bold;
+  border: 2px solid #cbd5e1;
+  border-right: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Last company header cell needs border-right */
+#tableContainer thead tr:first-child th:not(.metric-header):last-child {
+  border-right: 2px solid #cbd5e1;
+}
+
+#tableContainer thead tr:nth-child(2) th:not(:first-child) {
+  @apply bg-blue-100 text-blue-900 font-semibold;
+  border: 1px solid #cbd5e1;
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 2px solid #cbd5e1;
+}
+
+/* Last product header cell needs border-right */
+#tableContainer thead tr:nth-child(2) th:not(:first-child):last-child {
+  border-right: 1px solid #cbd5e1;
+}
