@@ -1,28 +1,28 @@
 {
-  "name": "Mini-Undercut+",
-  "company": "Dewalt",
-  "anchorSizes": [
-    {
-      "value": "3/8\"",
-      "Effective Embedment Depth (hef)": [
+    "name": "Mini-Undercut+",
+    "company": "Dewalt",
+    "anchorSizes": [
         {
-          "value": 0.75,
-          "Drill Bit Diameter": "5/8\"",
-          "Nominal Embedment Depth (hnom)": 0.75,
-          "Minimum Hole Depth (hhole)": 0.75,
-          "Cracked Concrete Data": true,
-          "Seismic Categories": "A-F",
-          "Anchor Category": 1,
-          "Tension Steel Strength (φNsa)": 2717,
-          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 312,
-          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 221,
-          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
-          "Pullout Strength - Cracked Concrete (φNp,cr)": 182,
-          "Shear Steel Strength (φVsa)": 537,
-          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 351,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 248
+            "value": "3/8\"",
+            "Effective Embedment Depth (hef)": [
+                {
+                    "value": 0.75,
+                    "Drill Bit Diameter": "5/8\"",
+                    "Nominal Embedment Depth (hnom)": 0.75,
+                    "Minimum Hole Depth (hhole)": 0.75,
+                    "Cracked Concrete Data": true,
+                    "Seismic Categories": "A-F",
+                    "Anchor Category": 1,
+                    "Tension Steel Strength (φNsa)": 2717,
+                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 312,
+                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 221,
+                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+                    "Pullout Strength - Cracked Concrete (φNp,cr)": 182,
+                    "Shear Steel Strength (φVsa)": 591,
+                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 351,
+                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 248
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
