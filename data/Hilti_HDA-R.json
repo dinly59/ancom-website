@@ -1,72 +1,72 @@
 {
-  "name": "HDA-R",
-  "company": "Hilti",
-  "anchorSizes": [
-    {
-      "value": "M10",
-      "Effective Embedment Depth (hef)": [
+    "name": "HDA-R",
+    "company": "Hilti",
+    "anchorSizes": [
         {
-          "value": 3.94,
-          "Drill Bit Diameter": "20 mm",
-          "Nominal Embedment Depth (hnom)": null,
-          "Minimum Hole Depth (hhole)": 4.21,
-          "Cracked Concrete Data": true,
-          "Seismic Categories": "A-F",
-          "Anchor Category": 1,
-          "Tension Steel Strength (φNsa)": 7830,
-          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 7625,
-          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 6100,
-          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
-          "Pullout Strength - Cracked Concrete (φNp,cr)": 5845,
-          "Shear Steel Strength (φVsa)": 3653,
-          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 16423,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 13139
-        }
-      ]
-    },
-    {
-      "value": "M12",
-      "Effective Embedment Depth (hef)": [
+            "value": "M10",
+            "Effective Embedment Depth (hef)": [
+                {
+                    "value": 3.94,
+                    "Drill Bit Diameter": "20 mm",
+                    "Nominal Embedment Depth (hnom)": null,
+                    "Minimum Hole Depth (hhole)": 4.21,
+                    "Cracked Concrete Data": true,
+                    "Seismic Categories": "A-F",
+                    "Anchor Category": 1,
+                    "Tension Steel Strength (φNsa)": 7830,
+                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 7625,
+                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 6100,
+                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+                    "Pullout Strength - Cracked Concrete (φNp,cr)": 5845,
+                    "Shear Steel Strength (φVsa)": 3946,
+                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 16423,
+                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 13139
+                }
+            ]
+        },
         {
-          "value": 4.92,
-          "Drill Bit Diameter": "22 mm",
-          "Nominal Embedment Depth (hnom)": null,
-          "Minimum Hole Depth (hhole)": 5.3,
-          "Cracked Concrete Data": true,
-          "Seismic Categories": "A-F",
-          "Anchor Category": 1,
-          "Tension Steel Strength (φNsa)": 11397,
-          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 10640,
-          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 8512,
-          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
-          "Pullout Strength - Cracked Concrete (φNp,cr)": 7306,
-          "Shear Steel Strength (φVsa)": 5260,
-          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 22917,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 18334
-        }
-      ]
-    },
-    {
-      "value": "M16",
-      "Effective Embedment Depth (hef)": [
+            "value": "M12",
+            "Effective Embedment Depth (hef)": [
+                {
+                    "value": 4.92,
+                    "Drill Bit Diameter": "22 mm",
+                    "Nominal Embedment Depth (hnom)": null,
+                    "Minimum Hole Depth (hhole)": 5.3,
+                    "Cracked Concrete Data": true,
+                    "Seismic Categories": "A-F",
+                    "Anchor Category": 1,
+                    "Tension Steel Strength (φNsa)": 11397,
+                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 10640,
+                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 8512,
+                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+                    "Pullout Strength - Cracked Concrete (φNp,cr)": 7306,
+                    "Shear Steel Strength (φVsa)": 5845,
+                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 22917,
+                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 18334
+                }
+            ]
+        },
         {
-          "value": 7.48,
-          "Drill Bit Diameter": "30 mm",
-          "Nominal Embedment Depth (hnom)": null,
-          "Minimum Hole Depth (hhole)": 7.99,
-          "Cracked Concrete Data": true,
-          "Seismic Categories": "A-F",
-          "Anchor Category": 1,
-          "Tension Steel Strength (φNsa)": 21141,
-          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 19946,
-          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 15957,
-          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
-          "Pullout Strength - Cracked Concrete (φNp,cr)": 14613,
-          "Shear Steel Strength (φVsa)": 9790,
-          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 42961,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 34369
+            "value": "M16",
+            "Effective Embedment Depth (hef)": [
+                {
+                    "value": 7.48,
+                    "Drill Bit Diameter": "30 mm",
+                    "Nominal Embedment Depth (hnom)": null,
+                    "Minimum Hole Depth (hhole)": 7.99,
+                    "Cracked Concrete Data": true,
+                    "Seismic Categories": "A-F",
+                    "Anchor Category": 1,
+                    "Tension Steel Strength (φNsa)": 21141,
+                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 19946,
+                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 15957,
+                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+                    "Pullout Strength - Cracked Concrete (φNp,cr)": 14613,
+                    "Shear Steel Strength (φVsa)": 10960,
+                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 42961,
+                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 34369
+                }
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
