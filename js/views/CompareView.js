@@ -208,10 +208,10 @@ class CompareView {
    */
   createChartContainer(id, title) {
     const div = document.createElement("div");
-    div.className = "bg-slate-50 p-4 rounded-lg";
+    div.className = "bg-white p-6 rounded-xl border border-slate-100 shadow-sm transition-shadow hover:shadow-md";
 
     const titleEl = document.createElement("h3");
-    titleEl.className = "text-lg font-semibold text-slate-700 mb-3 text-center";
+    titleEl.className = "text-xl font-bold text-slate-800 mb-4 text-center";
     titleEl.innerHTML = title;
     div.appendChild(titleEl);
 
@@ -280,7 +280,8 @@ class CompareView {
     Highcharts.chart(containerId, {
       chart: {
         type: "column",
-        animation: false,
+        animation: { duration: 500 },
+        backgroundColor: "transparent",
         style: { fontFamily: "inherit" },
         marginBottom: 100,
       },
@@ -291,14 +292,23 @@ class CompareView {
         categories: flatCategories,
         plotBands,
         plotLines,
-        labels: { style: { fontSize: "11px" } },
-        // tickWidth: 0,
+        labels: { 
+          style: { fontSize: "11px", color: "#64748b" },
+          y: 20
+        },
+        tickWidth: 0,
+        lineColor: "#cbd5e1"
       },
       yAxis: {
-        title: { text: yTitle },
+        title: { 
+          text: yTitle,
+          style: { color: "#475569", fontWeight: "600", fontSize: "13px" },
+          margin: 20
+        },
         min: 0,
         gridLineColor: "#e2e8f0",
         labels: {
+          style: { color: "#64748b" },
           formatter: function () {
             return this.value.toLocaleString();
           },
@@ -310,21 +320,34 @@ class CompareView {
           groupPadding: 0.1,
           pointPadding: 0.05,
           maxPointWidth: 40,
-          borderRadius: 3,
+          borderRadius: 4,
+          borderWidth: 0,
         },
       },
       tooltip: {
         useHTML: true,
+        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        borderColor: "#e2e8f0",
+        borderRadius: 8,
+        shadow: {
+          color: "rgba(0, 0, 0, 0.1)",
+          offsetX: 0,
+          offsetY: 4,
+          width: 8,
+          opacity: 0.1
+        },
+        padding: 12,
         formatter: function () {
           const ptIdx = this.point.index;
           const grp = groups.find(
             (g) => ptIdx >= g.startIndex && ptIdx <= g.endIndex,
           );
           return (
-            `<span style="font-size:11px;font-weight:bold">${this.series.name}</span><br/>` +
-            `Diameter: <b>Ø ${grp ? grp.size : ""}</b> &mdash; ` +
-            `h<sub>ef</sub>: <b>${this.point.category} in.</b><br/>` +
-            `Strength: <b>${(this.y || 0).toLocaleString()} lbs</b>`
+            `<div style="font-family: inherit; color: #334155;">` +
+            `<div style="font-size:13px; font-weight:700; color: #0f172a; margin-bottom: 6px;">${this.series.name}</div>` +
+            `<div style="font-size:12px; margin-bottom: 4px;">Diameter: <span style="font-weight:600;">Ø ${grp ? grp.size : ""}</span> &mdash; h<sub style="font-size:9px">ef</sub>: <span style="font-weight:600;">${this.point.category} in.</span></div>` +
+            `<div style="font-size:12px;">Strength: <span style="font-weight:700; color: #3b82f6;">${(this.y || 0).toLocaleString()} lbs</span></div>` +
+            `</div>`
           );
         },
       },
@@ -332,6 +355,8 @@ class CompareView {
         enabled: true,
         align: "center",
         verticalAlign: "bottom",
+        itemStyle: { color: "#475569", fontWeight: "500", cursor: "pointer" },
+        itemHoverStyle: { color: "#0f172a" }
       },
       series: series,
     });
