@@ -16,14 +16,17 @@
           "Tension Steel Strength (φNsa)": 4759,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 1433,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 1015,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 761,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
           "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
           "Shear Steel Strength (φVsa)": 1654,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 1543,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 1093
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 1093,
+          "Seismic_Shear Steel Strength (φVsa)": 1654
         },
         {
-          "value": 2,
+          "value": 2.0,
           "Drill Bit Diameter": "3/8\"",
           "Nominal Embedment Depth (hnom)": 2.375,
           "Minimum Hole Depth (hhole)": 2.75,
@@ -33,11 +36,14 @@
           "Tension Steel Strength (φNsa)": 4759,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 2206,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 1563,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 1172,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": 2070,
           "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
           "Shear Steel Strength (φVsa)": 1654,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 2376,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 1683
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 1683,
+          "Seismic_Shear Steel Strength (φVsa)": 1654
         }
       ]
     },
@@ -45,7 +51,7 @@
       "value": "1/2\"",
       "Effective Embedment Depth (hef)": [
         {
-          "value": 2,
+          "value": 2.0,
           "Drill Bit Diameter": "1/2\"",
           "Nominal Embedment Depth (hnom)": 2.375,
           "Minimum Hole Depth (hhole)": 2.75,
@@ -55,11 +61,14 @@
           "Tension Steel Strength (φNsa)": 8145,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 2206,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 1563,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 1172,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
           "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
           "Shear Steel Strength (φVsa)": 3393,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 2376,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 1683
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 1683,
+          "Seismic_Shear Steel Strength (φVsa)": 3393
         },
         {
           "value": 3.25,
@@ -72,11 +81,14 @@
           "Tension Steel Strength (φNsa)": 8145,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 4570,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 3237,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 2428,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
           "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Pullout Strength - Seismic (0.75φNp,eq)": 2416,
           "Shear Steel Strength (φVsa)": 3393,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 9843,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 6972
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 6972,
+          "Seismic_Shear Steel Strength (φVsa)": 3393
         }
       ]
     },
@@ -94,14 +106,17 @@
           "Tension Steel Strength (φNsa)": 12874,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 3557,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 2520,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 1890,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": 3146,
           "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
           "Shear Steel Strength (φVsa)": 5788,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 7661,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 5427
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 5427,
+          "Seismic_Shear Steel Strength (φVsa)": 5788
         },
         {
-          "value": 4,
+          "value": 4.0,
           "Drill Bit Diameter": "5/8\"",
           "Nominal Embedment Depth (hnom)": 4.5,
           "Minimum Hole Depth (hhole)": 4.75,
@@ -111,11 +126,14 @@
           "Tension Steel Strength (φNsa)": 12874,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 6240,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 4420,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 3315,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": 5876,
           "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
           "Shear Steel Strength (φVsa)": 5788,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 13440,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 9520
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 9520,
+          "Seismic_Shear Steel Strength (φVsa)": 5788
         }
       ]
     },
@@ -125,7 +143,7 @@
         {
           "value": 3.25,
           "Drill Bit Diameter": "3/4\"",
-          "Nominal Embedment Depth (hnom)": 4,
+          "Nominal Embedment Depth (hnom)": 4.0,
           "Minimum Hole Depth (hhole)": 4.25,
           "Cracked Concrete Data": true,
           "Seismic Categories": "A-F",
@@ -133,11 +151,14 @@
           "Tension Steel Strength (φNsa)": 18221,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 4570,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 3999,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 2999,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
           "Pullout Strength - Cracked Concrete (φNp,cr)": 3244,
+          "Pullout Strength - Seismic (0.75φNp,eq)": 2433,
           "Shear Steel Strength (φVsa)": 6997,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 9843,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 8613
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 8613,
+          "Seismic_Shear Steel Strength (φVsa)": 5948
         },
         {
           "value": 4.75,
@@ -150,11 +171,14 @@
           "Tension Steel Strength (φNsa)": 18221,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 8075,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 7066,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 5299,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
           "Pullout Strength - Cracked Concrete (φNp,cr)": 5782,
+          "Pullout Strength - Seismic (0.75φNp,eq)": 3898,
           "Shear Steel Strength (φVsa)": 6997,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 17392,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 15218
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 15218,
+          "Seismic_Shear Steel Strength (φVsa)": 5948
         }
       ]
     }

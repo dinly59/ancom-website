@@ -1,28 +1,31 @@
 {
-    "name": "UTB",
-    "company": "British Fastening",
-    "anchorSizes": [
+  "name": "UTB",
+  "company": "British Fastening",
+  "anchorSizes": [
+    {
+      "value": "1/4\"",
+      "Effective Embedment Depth (hef)": [
         {
-            "value": "1/4\"",
-            "Effective Embedment Depth (hef)": [
-                {
-                    "value": 1.2,
-                    "Drill Bit Diameter": "1/4\"",
-                    "Nominal Embedment Depth (hnom)": null,
-                    "Minimum Hole Depth (hhole)": 2,
-                    "Cracked Concrete Data": true,
-                    "Seismic Categories": "A-F",
-                    "Anchor Category": 3,
-                    "Tension Steel Strength (φNsa)": 3104,
-                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 710,
-                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 503,
-                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": 781,
-                    "Pullout Strength - Cracked Concrete (φNp,cr)": 567,
-                    "Shear Steel Strength (φVsa)": 772,
-                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 1104,
-                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 782
-                }
-            ]
+          "value": 1.2,
+          "Drill Bit Diameter": "1/4\"",
+          "Nominal Embedment Depth (hnom)": null,
+          "Minimum Hole Depth (hhole)": 2.0,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 3,
+          "Tension Steel Strength (φNsa)": 3104,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 710,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 503,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 377,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": 781,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": 567,
+          "Pullout Strength - Seismic (0.75φNp,eq)": 425,
+          "Shear Steel Strength (φVsa)": 772,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 1104,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 782,
+          "Seismic_Shear Steel Strength (φVsa)": 821
         }
-    ]
+      ]
+    }
+  ]
 }
