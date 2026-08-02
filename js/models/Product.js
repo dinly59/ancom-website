@@ -3,12 +3,27 @@
  */
 class Product {
   constructor(data = {}) {
+    this.filename = data.filename || null;
     this.name = data.name || null;
     this.company = data.company || null;
     this.anchorSizes = [];
 
+    const productName = this.getDisplayName();
     const anchorSizeArray = data.anchorSizes || [];
-    this.anchorSizes = anchorSizeArray.map((a) => new AnchorSize(a));
+    this.anchorSizes = anchorSizeArray.map(
+      (a) => new AnchorSize(a, { productName, filename: this.filename }),
+    );
+  }
+
+  /**
+   * Get display name for product
+   */
+  getDisplayName() {
+    if (this.company && this.name) {
+      return `${this.company} - ${this.name}`;
+    }
+
+    return "Unnamed Product";
   }
 
   /**
@@ -33,5 +48,32 @@ class Product {
       (sum, a) => sum + a.effectiveEmbedmentDepths.length,
       0,
     );
+  }
+
+  /**
+   * Check if product supports cracked concrete data (at least 1 hef has crackedConcreteData === true)
+   */
+  hasCrackedConcreteData() {
+    return this.anchorSizes.some((a) =>
+      (a.effectiveEmbedmentDepths || []).some(
+        (e) => e.crackedConcreteData === true,
+      ),
+    );
+  }
+
+  /**
+   * Check if product supports uncracked concrete data (all products support uncracked concrete)
+   */
+  hasUncrackedConcreteData() {
+    return true;
+  }
+
+  /**
+   * Check if product supports given concrete state ("cracked" or "uncracked")
+   */
+  supportsConcreteState(state) {
+    if (state === "cracked") return this.hasCrackedConcreteData();
+    if (state === "uncracked") return this.hasUncrackedConcreteData();
+    return true;
   }
 }

@@ -70,8 +70,15 @@ class TableController {
       '<option value="">Select a product...</option>';
     products.forEach((p) => {
       const opt = document.createElement("option");
-      opt.value = p;
-      opt.textContent = p.replace(/\.json$/, "");
+      const filename = typeof p === "string" ? p : (p.filename || p.name);
+      const label =
+        typeof p === "object" && typeof p.getDisplayName === "function"
+          ? p.getDisplayName()
+          : typeof p === "string"
+            ? p.replace(/\.json$/, "")
+            : p.name || p.filename;
+      opt.value = filename;
+      opt.textContent = label;
       this.productSelect.appendChild(opt);
     });
   }
@@ -82,7 +89,10 @@ class TableController {
   async loadFirstProduct() {
     const products = this.model.getProducts();
     if (products.length > 0 && !this.currentProduct) {
-      this.productSelect.value = products[0];
+      const first = products[0];
+      const filename =
+        typeof first === "string" ? first : first.filename || first.name;
+      this.productSelect.value = filename;
       await this.handleProductChange();
     }
   }

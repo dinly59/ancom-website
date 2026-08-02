@@ -6,7 +6,7 @@
       "value": "3/8\"",
       "Effective Embedment Depth (hef)": [
         {
-          "value": 2,
+          "value": 2.0,
           "Drill Bit Diameter": "3/8\"",
           "Nominal Embedment Depth (hnom)": 2.375,
           "Minimum Hole Depth (hhole)": 2.75,
@@ -16,11 +16,14 @@
           "Tension Steel Strength (φNsa)": 4578,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 2206,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 1563,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 1172,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": 1958,
           "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
           "Shear Steel Strength (φVsa)": 1630,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 2376,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 1683
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 1683,
+          "Seismic_Shear Steel Strength (φVsa)": 1304
         }
       ]
     },
@@ -30,7 +33,7 @@
         {
           "value": 2.5,
           "Drill Bit Diameter": "1/2\"",
-          "Nominal Embedment Depth (hnom)": 3,
+          "Nominal Embedment Depth (hnom)": 3.0,
           "Minimum Hole Depth (hhole)": 3.25,
           "Cracked Concrete Data": true,
           "Seismic Categories": "A-F",
@@ -38,11 +41,14 @@
           "Tension Steel Strength (φNsa)": 8111,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 3083,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 2698,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 2023,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": 2206,
           "Pullout Strength - Cracked Concrete (φNp,cr)": 1930,
+          "Pullout Strength - Seismic (0.75φNp,eq)": 1448,
           "Shear Steel Strength (φVsa)": 3575,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 3320,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 2905
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 2905,
+          "Seismic_Shear Steel Strength (φVsa)": 2860
         }
       ]
     },
@@ -50,7 +56,7 @@
       "value": "5/8\"",
       "Effective Embedment Depth (hef)": [
         {
-          "value": 3,
+          "value": 3.0,
           "Drill Bit Diameter": "5/8\"",
           "Nominal Embedment Depth (hnom)": 3.5625,
           "Minimum Hole Depth (hhole)": 3.75,
@@ -60,11 +66,14 @@
           "Tension Steel Strength (φNsa)": 12546,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 4560,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 3546,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 2660,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
           "Pullout Strength - Cracked Concrete (φNp,cr)": 2624,
+          "Pullout Strength - Seismic (0.75φNp,eq)": 1968,
           "Shear Steel Strength (φVsa)": 6450,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 9821,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 7638
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 7638,
+          "Seismic_Shear Steel Strength (φVsa)": 5160
         }
       ]
     },
@@ -82,11 +91,14 @@
           "Tension Steel Strength (φNsa)": 18207,
           "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 5746,
           "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 5107,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 3831,
           "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
           "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
           "Shear Steel Strength (φVsa)": 11789,
           "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 12376,
-          "Pryout Strength - Cracked Concrete (φVcp,cr)": 11000
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 11000,
+          "Seismic_Shear Steel Strength (φVsa)": 10715
         }
       ]
     }

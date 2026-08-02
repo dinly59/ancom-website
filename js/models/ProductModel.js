@@ -18,7 +18,8 @@ class ProductModel {
    * Initialize and load product list
    */
   async initialize() {
-    this.products = await this.fetchProductList();
+    const filenames = await this.fetchProductList();
+    this.products = await this.loadProductSchemas(filenames);
     return this.products;
   }
 
@@ -51,6 +52,7 @@ class ProductModel {
       const resp = await fetch(this.DATA_PATH + filename);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
       const data = await resp.json();
+      data.filename = filename;
       this.cachedData.set(filename, data);
       return data;
     } catch (e) {
@@ -83,10 +85,20 @@ class ProductModel {
   }
 
   /**
-   * Get all available products
+   * Get all available products, optionally filtered by concrete state
    */
-  getProducts() {
-    return this.products;
+  getProducts(concreteState) {
+    if (!concreteState) return this.products;
+    return this.products.filter((p) => p.supportsConcreteState(concreteState));
+  }
+
+  /**
+   * Get product by filename or name
+   */
+  getProductByFilename(filename) {
+    return this.products.find(
+      (p) => p.filename === filename || p.name === filename,
+    );
   }
 
   /**

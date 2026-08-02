@@ -1,94 +1,106 @@
 {
-    "name": "HDA",
-    "company": "Hilti",
-    "anchorSizes": [
+  "name": "HDA",
+  "company": "Hilti",
+  "anchorSizes": [
+    {
+      "value": "M10",
+      "Effective Embedment Depth (hef)": [
         {
-            "value": "M10",
-            "Effective Embedment Depth (hef)": [
-                {
-                    "value": 3.94,
-                    "Drill Bit Diameter": "20 mm",
-                    "Nominal Embedment Depth (hnom)": null,
-                    "Minimum Hole Depth (hhole)": 4.21,
-                    "Cracked Concrete Data": true,
-                    "Seismic Categories": "A-F",
-                    "Anchor Category": 1,
-                    "Tension Steel Strength (φNsa)": 7830,
-                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 7625,
-                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 6100,
-                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
-                    "Pullout Strength - Cracked Concrete (φNp,cr)": 5845,
-                    "Shear Steel Strength (φVsa)": 3258,
-                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 16423,
-                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 13139
-                }
-            ]
-        },
-        {
-            "value": "M12",
-            "Effective Embedment Depth (hef)": [
-                {
-                    "value": 4.92,
-                    "Drill Bit Diameter": "22 mm",
-                    "Nominal Embedment Depth (hnom)": null,
-                    "Minimum Hole Depth (hhole)": 5.3,
-                    "Cracked Concrete Data": true,
-                    "Seismic Categories": "A-F",
-                    "Anchor Category": 1,
-                    "Tension Steel Strength (φNsa)": 11397,
-                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 10640,
-                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 8512,
-                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
-                    "Pullout Strength - Cracked Concrete (φNp,cr)": 7306,
-                    "Shear Steel Strength (φVsa)": 4735,
-                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 22917,
-                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 18334
-                }
-            ]
-        },
-        {
-            "value": "M16",
-            "Effective Embedment Depth (hef)": [
-                {
-                    "value": 7.48,
-                    "Drill Bit Diameter": "30 mm",
-                    "Nominal Embedment Depth (hnom)": null,
-                    "Minimum Hole Depth (hhole)": 7.99,
-                    "Cracked Concrete Data": true,
-                    "Seismic Categories": "A-F",
-                    "Anchor Category": 1,
-                    "Tension Steel Strength (φNsa)": 21141,
-                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 19946,
-                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 15957,
-                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
-                    "Pullout Strength - Cracked Concrete (φNp,cr)": 14613,
-                    "Shear Steel Strength (φVsa)": 8811,
-                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 42961,
-                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 34369
-                }
-            ]
-        },
-        {
-            "value": "M20",
-            "Effective Embedment Depth (hef)": [
-                {
-                    "value": 9.84,
-                    "Drill Bit Diameter": "37 mm",
-                    "Nominal Embedment Depth (hnom)": null,
-                    "Minimum Hole Depth (hhole)": 10.47,
-                    "Cracked Concrete Data": true,
-                    "Seismic Categories": "A-F",
-                    "Anchor Category": 1,
-                    "Tension Steel Strength (φNsa)": 33060,
-                    "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 30095,
-                    "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 24076,
-                    "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
-                    "Pullout Strength - Cracked Concrete (φNp,cr)": 21919,
-                    "Shear Steel Strength (φVsa)": 13502,
-                    "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 64820,
-                    "Pryout Strength - Cracked Concrete (φVcp,cr)": 51856
-                }
-            ]
+          "value": 3.94,
+          "Drill Bit Diameter": "20 mm",
+          "Nominal Embedment Depth (hnom)": null,
+          "Minimum Hole Depth (hhole)": 4.21,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 7830,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 7625,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 6100,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 4575,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": 5845,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
+          "Shear Steel Strength (φVsa)": 3258,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 16423,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 13139,
+          "Seismic_Shear Steel Strength (φVsa)": 2922
         }
-    ]
+      ]
+    },
+    {
+      "value": "M12",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 4.92,
+          "Drill Bit Diameter": "22 mm",
+          "Nominal Embedment Depth (hnom)": null,
+          "Minimum Hole Depth (hhole)": 5.3,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 11397,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 10640,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 8512,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 6384,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": 7306,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
+          "Shear Steel Strength (φVsa)": 4735,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 22917,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 18334,
+          "Seismic_Shear Steel Strength (φVsa)": 4237
+        }
+      ]
+    },
+    {
+      "value": "M16",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 7.48,
+          "Drill Bit Diameter": "30 mm",
+          "Nominal Embedment Depth (hnom)": null,
+          "Minimum Hole Depth (hhole)": 7.99,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 21141,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 19946,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 15957,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 11968,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": 14613,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
+          "Shear Steel Strength (φVsa)": 8811,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 42961,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 34369,
+          "Seismic_Shear Steel Strength (φVsa)": 7891
+        }
+      ]
+    },
+    {
+      "value": "M20",
+      "Effective Embedment Depth (hef)": [
+        {
+          "value": 9.84,
+          "Drill Bit Diameter": "37 mm",
+          "Nominal Embedment Depth (hnom)": null,
+          "Minimum Hole Depth (hhole)": 10.47,
+          "Cracked Concrete Data": true,
+          "Seismic Categories": "A-F",
+          "Anchor Category": 1,
+          "Tension Steel Strength (φNsa)": 33060,
+          "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 30095,
+          "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 24076,
+          "Tension Breakout Strength - Seismic (0.75φNcb)": 18057,
+          "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+          "Pullout Strength - Cracked Concrete (φNp,cr)": 21919,
+          "Pullout Strength - Seismic (0.75φNp,eq)": null,
+          "Shear Steel Strength (φVsa)": 13502,
+          "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 64820,
+          "Pryout Strength - Cracked Concrete (φVcp,cr)": 51856,
+          "Seismic_Shear Steel Strength (φVsa)": 12128
+        }
+      ]
+    }
+  ]
 }
