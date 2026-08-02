@@ -26,31 +26,41 @@ class CompareController {
       anchorSize?.effectiveEmbedmentDepths ||
       [];
 
-    // Collect unique anchor sizes across all products
-    const uniqueSizes = new Set();
-    productsData.forEach((product) => {
-      (product.anchorSizes || []).forEach((a) => {
-        const size = getAnchorSize(a).value;
-        if (size) uniqueSizes.add(size);
-      });
-    });
-    const allSizes = Array.from(uniqueSizes).sort(
-      (a, b) => parseSize(a) - parseSize(b),
-    );
+    const isHefSupported = (h, state) => {
+      if (!h) return false;
+      if (state === "cracked") {
+        return typeof h.supportsCrackedConcrete === "function"
+          ? h.supportsCrackedConcrete()
+          : Boolean(h.crackedConcreteData);
+      }
+      if (state === "uncracked") {
+        return typeof h.supportsUncrackedConcrete === "function"
+          ? h.supportsUncrackedConcrete()
+          : true;
+      }
+      return true;
+    };
 
-    // For each size collect all hef values from all products
+    // Collect all supported hef values for each anchor size across all products
     const sizeToHefs = new Map();
     productsData.forEach((product) => {
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
         const size = anchorSize.value;
         if (!size) return;
-        if (!sizeToHefs.has(size)) sizeToHefs.set(size, new Set());
-        getEmbedmentDepths(anchorSize).forEach((h) =>
-          sizeToHefs.get(size).add(h.value),
-        );
+
+        getEmbedmentDepths(anchorSize).forEach((h) => {
+          if (isHefSupported(h, concreteState)) {
+            if (!sizeToHefs.has(size)) sizeToHefs.set(size, new Set());
+            sizeToHefs.get(size).add(h.value);
+          }
+        });
       });
     });
+
+    const allSizes = Array.from(sizeToHefs.keys()).sort(
+      (a, b) => parseSize(a) - parseSize(b),
+    );
 
     // Build flat x-axis categories + groups metadata for plotBands/plotLines.
     // One slot per hef; grouping:false lets each series render independently
@@ -101,7 +111,7 @@ class CompareController {
       const values = keys
         .map((key) => getPhi(h, key))
         .filter(
-          (value) => value !== null && value !== undefined && value !== "",
+          (value) => value !== null && value !== undefined && value !== "" && value !== "NP",
         )
         .map((value) => Number(value))
         .filter((value) => !Number.isNaN(value));
@@ -118,10 +128,12 @@ class CompareController {
         const anchorSize = getAnchorSize(a);
         const size = anchorSize.value;
         getEmbedmentDepths(anchorSize).forEach((h) => {
-          map.set(
-            `${size}-${h.value}`,
-            getMinimumPhi(h, ["φNsa", "φNcb", "φNp"]),
-          );
+          if (isHefSupported(h, concreteState)) {
+            map.set(
+              `${size}-${h.value}`,
+              getMinimumPhi(h, ["φNsa", "φNcb", "φNp"]),
+            );
+          }
         });
       });
       return {
@@ -138,7 +150,9 @@ class CompareController {
         const anchorSize = getAnchorSize(a);
         const size = anchorSize.value;
         getEmbedmentDepths(anchorSize).forEach((h) => {
-          map.set(`${size}-${h.value}`, getMinimumPhi(h, ["φVsa", "φVcp"]));
+          if (isHefSupported(h, concreteState)) {
+            map.set(`${size}-${h.value}`, getMinimumPhi(h, ["φVsa", "φVcp"]));
+          }
         });
       });
       return {
@@ -179,13 +193,31 @@ class CompareController {
    */
   bindEvents() {
     this.compareBtn?.addEventListener("click", () => this.handleCompare());
+    this.concreteStateRadios.forEach((radio) => {
+      radio.addEventListener("change", () => this.handleConcreteStateChange());
+    });
   }
 
   /**
    * Initialize with products
    */
   async initialize() {
-    const products = this.model.getProducts();
+    this.updateCompareSelects();
+  }
+
+  /**
+   * Handle change on concrete state radio buttons
+   */
+  handleConcreteStateChange() {
+    this.updateCompareSelects();
+  }
+
+  /**
+   * Update compare selects based on currently selected concrete state
+   */
+  updateCompareSelects() {
+    const concreteState = this.getConcreteState();
+    const products = this.model.getProducts(concreteState);
     this.populateCompareSelects(products);
   }
 
@@ -195,13 +227,28 @@ class CompareController {
   populateCompareSelects(products) {
     [this.compareProduct1, this.compareProduct2].forEach((select) => {
       if (select) {
+        const currentValue = select.value;
         select.innerHTML = '<option value="">Select a product...</option>';
         products.forEach((p) => {
           const opt = document.createElement("option");
-          opt.value = p;
-          opt.textContent = p.replace(/\.json$/, "");
+          const filename = p.filename || p.name;
+          const label =
+            typeof p.getDisplayName === "function"
+              ? p.getDisplayName()
+              : p.name || p.filename;
+          opt.value = filename;
+          opt.textContent = label;
           select.appendChild(opt);
         });
+
+        if (
+          currentValue &&
+          products.some((p) => (p.filename || p.name) === currentValue)
+        ) {
+          select.value = currentValue;
+        } else {
+          select.value = "";
+        }
       }
     });
   }
