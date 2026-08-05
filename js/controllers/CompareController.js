@@ -186,6 +186,8 @@ class CompareController {
     this.concreteStateRadios = document.querySelectorAll(
       'input[name="concreteState"]',
     );
+    this.compareCompany1 = document.getElementById("compareCompany1");
+    this.compareCompany2 = document.getElementById("compareCompany2");
   }
 
   /**
@@ -196,6 +198,8 @@ class CompareController {
     this.concreteStateRadios.forEach((radio) => {
       radio.addEventListener("change", () => this.handleConcreteStateChange());
     });
+    this.compareCompany1?.addEventListener("change", () => this.handleCompanyFilterChange(1));
+    this.compareCompany2?.addEventListener("change", () => this.handleCompanyFilterChange(2));
   }
 
   /**
@@ -213,44 +217,87 @@ class CompareController {
   }
 
   /**
-   * Update compare selects based on currently selected concrete state
+   * Handle change on company filter dropdown
    */
-  updateCompareSelects() {
-    const concreteState = this.getConcreteState();
-    const products = this.model.getProducts(concreteState);
-    this.populateCompareSelects(products);
+  handleCompanyFilterChange(index) {
+    this.updateCompareSelects(index);
   }
 
   /**
-   * Populate comparison dropdowns
+   * Update compare selects based on currently selected concrete state and company filter
    */
-  populateCompareSelects(products) {
-    [this.compareProduct1, this.compareProduct2].forEach((select) => {
-      if (select) {
-        const currentValue = select.value;
-        select.innerHTML = '<option value="">Select a product...</option>';
-        products.forEach((p) => {
-          const opt = document.createElement("option");
-          const filename = p.filename || p.name;
-          const label =
-            typeof p.getDisplayName === "function"
-              ? p.getDisplayName()
-              : p.name || p.filename;
-          opt.value = filename;
-          opt.textContent = label;
-          select.appendChild(opt);
-        });
+  updateCompareSelects(index) {
+    const concreteState = this.getConcreteState();
+    let allProducts = this.model.getProducts(concreteState);
 
-        if (
-          currentValue &&
-          products.some((p) => (p.filename || p.name) === currentValue)
-        ) {
-          select.value = currentValue;
-        } else {
-          select.value = "";
-        }
+    // Only update company lists when concrete state changes (i.e. no index provided)
+    if (!index) {
+      this.populateCompanyFilters(allProducts);
+    }
+
+    if (!index || index === 1) {
+      this.updateProductSelect(this.compareCompany1, this.compareProduct1, allProducts);
+    }
+    if (!index || index === 2) {
+      this.updateProductSelect(this.compareCompany2, this.compareProduct2, allProducts);
+    }
+  }
+
+  /**
+   * Populate company filter dropdowns
+   */
+  populateCompanyFilters(products) {
+    const companies = [...new Set(products.map((p) => p.company).filter(Boolean))].sort();
+
+    [this.compareCompany1, this.compareCompany2].forEach((select) => {
+      if (!select) return;
+      const currentCompany = select.value;
+      select.innerHTML = '<option value="">All Companies</option>';
+      
+      companies.forEach((company) => {
+        const opt = document.createElement("option");
+        opt.value = company;
+        opt.textContent = company;
+        select.appendChild(opt);
+      });
+
+      if (companies.includes(currentCompany)) {
+        select.value = currentCompany;
+      } else {
+        select.value = "";
       }
     });
+  }
+
+  /**
+   * Update a specific product select based on its company filter
+   */
+  updateProductSelect(companySelect, productSelect, allProducts) {
+    if (!productSelect) return;
+    
+    let products = allProducts;
+    const selectedCompany = companySelect?.value;
+    if (selectedCompany) {
+      products = products.filter((p) => p.company === selectedCompany);
+    }
+
+    const currentValue = productSelect.value;
+    productSelect.innerHTML = '<option value="">Select a product...</option>';
+    
+    products.forEach((p) => {
+      const opt = document.createElement("option");
+      const filename = p.filename || p.name;
+      const label = typeof p.getDisplayName === "function" ? p.getDisplayName() : p.name || p.filename;
+      opt.value = filename;
+      opt.textContent = label;
+      productSelect.appendChild(opt);
+    });
+
+    if (currentValue && products.some((p) => (p.filename || p.name) === currentValue)) {
+      productSelect.value = currentValue;
+    } else {
+      productSelect.value = "";
+    }
   }
 
   /**
