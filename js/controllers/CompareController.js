@@ -31,7 +31,7 @@ class CompareController {
       if (state === "cracked") {
         return typeof h.supportsCrackedConcrete === "function"
           ? h.supportsCrackedConcrete()
-          : Boolean(h.crackedConcreteData);
+          : Boolean(h.crackedConcreteData?.value);
       }
       if (state === "uncracked") {
         return typeof h.supportsUncrackedConcrete === "function"
@@ -46,13 +46,13 @@ class CompareController {
     productsData.forEach((product) => {
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
-        const size = anchorSize.value;
+        const size = anchorSize.value?.value || anchorSize.value;
         if (!size) return;
 
         getEmbedmentDepths(anchorSize).forEach((h) => {
           if (isHefSupported(h, concreteState)) {
             if (!sizeToHefs.has(size)) sizeToHefs.set(size, new Set());
-            sizeToHefs.get(size).add(h.value);
+            sizeToHefs.get(size).add(h.value?.value || h.value);
           }
         });
       });
@@ -87,22 +87,22 @@ class CompareController {
 
     // Helper to get the correct phi value based on concrete state
     function getPhi(h, key) {
-      if (key === "φNsa") return h.tensionSteelStrength ?? null;
-      if (key === "φVsa") return h.shearSteelStrength ?? null;
+      if (key === "φNsa") return h.tensionSteelStrength?.value ?? null;
+      if (key === "φVsa") return h.shearSteelStrength?.value ?? null;
       if (key === "φNcb") {
         return concreteState === "cracked"
-          ? h.tensionBreakoutCracked
-          : h.tensionBreakoutUncracked;
+          ? h.tensionBreakoutCracked?.value
+          : h.tensionBreakoutUncracked?.value;
       }
       if (key === "φNp") {
         return concreteState === "cracked"
-          ? h.pulloutCracked
-          : h.pulloutUncracked;
+          ? h.pulloutCracked?.value
+          : h.pulloutUncracked?.value;
       }
       if (key === "φVcp") {
         return concreteState === "cracked"
-          ? h.pryoutCracked
-          : h.pryoutUncracked;
+          ? h.pryoutCracked?.value
+          : h.pryoutUncracked?.value;
       }
       return null;
     }
@@ -126,18 +126,18 @@ class CompareController {
       const map = new Map();
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
-        const size = anchorSize.value;
+        const size = anchorSize.value?.value || anchorSize.value;
         getEmbedmentDepths(anchorSize).forEach((h) => {
           if (isHefSupported(h, concreteState)) {
             map.set(
-              `${size}-${h.value}`,
+              `${size}-${h.value?.value || h.value}`,
               getMinimumPhi(h, ["φNsa", "φNcb", "φNp"]),
             );
           }
         });
       });
       return {
-        name: product.name || `Product ${idx + 1}`,
+        name: product.name?.value || product.name || `Product ${idx + 1}`,
         data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
         color: this.view.colors[idx % this.view.colors.length],
       };
@@ -148,15 +148,15 @@ class CompareController {
       const map = new Map();
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
-        const size = anchorSize.value;
+        const size = anchorSize.value?.value || anchorSize.value;
         getEmbedmentDepths(anchorSize).forEach((h) => {
           if (isHefSupported(h, concreteState)) {
-            map.set(`${size}-${h.value}`, getMinimumPhi(h, ["φVsa", "φVcp"]));
+            map.set(`${size}-${h.value?.value || h.value}`, getMinimumPhi(h, ["φVsa", "φVcp"]));
           }
         });
       });
       return {
-        name: product.name || `Product ${idx + 1}`,
+        name: product.name?.value || product.name || `Product ${idx + 1}`,
         data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
         color: this.view.colors[idx % this.view.colors.length],
       };
@@ -247,13 +247,19 @@ class CompareController {
    * Populate company filter dropdowns
    */
   populateCompanyFilters(products) {
-    const companies = [...new Set(products.map((p) => p.company).filter(Boolean))].sort();
+    const companies = [
+      ...new Set(
+        products
+          .map((p) => p.company?.value || p.company)
+          .filter(Boolean),
+      ),
+    ].sort();
 
     [this.compareCompany1, this.compareCompany2].forEach((select) => {
       if (!select) return;
       const currentCompany = select.value;
       select.innerHTML = '<option value="">All Companies</option>';
-      
+
       companies.forEach((company) => {
         const opt = document.createElement("option");
         opt.value = company;
@@ -274,11 +280,13 @@ class CompareController {
    */
   updateProductSelect(companySelect, productSelect, allProducts) {
     if (!productSelect) return;
-    
+
     let products = allProducts;
     const selectedCompany = companySelect?.value;
     if (selectedCompany) {
-      products = products.filter((p) => p.company === selectedCompany);
+      products = products.filter(
+        (p) => (p.company?.value || p.company) === selectedCompany,
+      );
     }
 
     const currentValue = productSelect.value;

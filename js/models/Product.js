@@ -4,8 +4,23 @@
 class Product {
   constructor(data = {}) {
     this.filename = data.filename || null;
-    this.name = data.name || null;
-    this.company = data.company || null;
+    this.company = new Parameter("Manufacturer Name", data.company || null);
+    this.name = new Parameter("Product", data.name || null);
+    this.material = new Parameter("Material", data.material || null);
+    this.productImage = new Parameter(
+      "Product Image",
+      data.productImage || data["Product Image"] || null,
+    );
+    this.anchorType = data.anchorType || null;
+    this.evaluationReport = new Parameter(
+      "Evaluation Report",
+      data.evaluationReport || null,
+    );
+    this.dateIssued = new Parameter(
+      "Date Issued or Renewed",
+      data.dateIssued || data["Date Issued or Renewed"] || null,
+    );
+    this.dateExpires = new Parameter("Date Expires", data.dateExpires || null);
     this.anchorSizes = [];
 
     const productName = this.getDisplayName();
@@ -19,8 +34,10 @@ class Product {
    * Get display name for product
    */
   getDisplayName() {
-    if (this.company && this.name) {
-      return `${this.company} - ${this.name}`;
+    const comp = this.company?.value;
+    const prodName = this.name?.value;
+    if (comp && prodName) {
+      return `${comp} - ${prodName}`;
     }
 
     return "Unnamed Product";
@@ -56,7 +73,7 @@ class Product {
   hasCrackedConcreteData() {
     return this.anchorSizes.some((a) =>
       (a.effectiveEmbedmentDepths || []).some(
-        (e) => e.crackedConcreteData === true,
+        (e) => e.crackedConcreteData?.value === true || e.crackedConcreteData?.value === "true",
       ),
     );
   }
