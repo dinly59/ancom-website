@@ -9,25 +9,7 @@ class TableView {
     this.sortAscending = true;
     this.currentPage = 1;
     this.PAGE_SIZE = 10;
-    // Row labels (metrics) - transposed from columns
-    this.rowMetrics = [
-      { label: "Anchor Size", key: "anchorSize" },
-      { label: "Drill Bit", key: "drillBit" },
-      { label: "h<sub>ef</sub>", key: "hef" },
-      { label: "h<sub>nom</sub>", key: "hnom" },
-      { label: "h<sub>hole</sub>", key: "hhole" },
-      { label: "Cracked", key: "cracked" },
-      { label: "Seismic", key: "seismic" },
-      { label: "Category", key: "category" },
-      { label: "φN<sub>sa</sub>", key: "φNsa" },
-      { label: "φN<sub>cb</sub>", key: "φNcb" },
-      { label: "φN<sub>cb_cr</sub>", key: "φNcb_cr" },
-      { label: "φN<sub>p_uncr</sub>", key: "φNp_uncr" },
-      { label: "φN<sub>p_cr</sub>", key: "φNp_cr" },
-      { label: "φV<sub>sa</sub>", key: "φVsa" },
-      { label: "φV<sub>cp_uncr</sub>", key: "φVcp_uncr" },
-      { label: "φV<sub>cp_cr</sub>", key: "φVcp_cr" },
-    ];
+    this.rowMetrics = []; // will be set dynamically
   }
 
   /**
@@ -63,11 +45,104 @@ class TableView {
   /**
    * Render the product data table (transposed view)
    */
-  render(data, filter = "") {
+  render(data, filter = "", compactMode = false) {
     this.container.innerHTML = "";
     if (!data) {
       this.showError("No data available");
       return;
+    }
+
+    if (compactMode) {
+      const sampleAnchor = data.anchorSizes?.[0];
+      const sampleHef = sampleAnchor?.effectiveEmbedmentDepths?.[0];
+
+      const compactParams = sampleHef
+        ? [
+            sampleAnchor?.value,
+            sampleHef.drillBitDiameter,
+            sampleHef.value,
+            sampleHef.nominalEmbedmentDepth,
+            sampleHef.minimumHoleDepth,
+            sampleHef.crackedConcreteData,
+            sampleHef.seismicCategories,
+            sampleHef.anchorCategory,
+            sampleHef.tensionSteelStrength,
+            sampleHef.tensionBreakoutUncracked,
+            sampleHef.tensionBreakoutCracked,
+            sampleHef.pulloutUncracked,
+            sampleHef.pulloutCracked,
+            sampleHef.shearSteelStrength,
+            sampleHef.pryoutUncracked,
+            sampleHef.pryoutCracked,
+          ].filter(
+            (p) =>
+              p &&
+              p.constructor &&
+              p.constructor.name === "Parameter" &&
+              p.title,
+          )
+        : [];
+
+      this.rowMetrics = compactParams.map((p) => ({
+        label: p.title,
+        key: p.title,
+      }));
+    } else {
+      const dynamicFullMetricsMap = new Map();
+
+      // Collect parameters from Product (data), excluding Manufacturer Name and Product which are displayed in the header
+      Object.values(data).forEach((prop) => {
+        if (
+          prop &&
+          prop.constructor &&
+          prop.constructor.name === "Parameter" &&
+          prop.title &&
+          prop.title !== "Manufacturer Name" &&
+          prop.title !== "Product"
+        ) {
+          if (!dynamicFullMetricsMap.has(prop.title)) {
+            dynamicFullMetricsMap.set(prop.title, prop.title);
+          }
+        }
+      });
+
+      // Collect parameters from AnchorSizes and EffectiveEmbedmentDepths
+      const anchorSizes = data.anchorSizes || [];
+      anchorSizes.forEach((a) => {
+        if (
+          a.value &&
+          a.value.constructor &&
+          a.value.constructor.name === "Parameter" &&
+          a.value.title
+        ) {
+          if (!dynamicFullMetricsMap.has(a.value.title)) {
+            dynamicFullMetricsMap.set(a.value.title, a.value.title);
+          }
+        }
+
+        const hefs = a.effectiveEmbedmentDepths || [];
+        hefs.forEach((h) => {
+          Object.values(h).forEach((prop) => {
+            if (
+              prop &&
+              prop.constructor &&
+              prop.constructor.name === "Parameter" &&
+              prop.title
+            ) {
+              if (!dynamicFullMetricsMap.has(prop.title)) {
+                dynamicFullMetricsMap.set(prop.title, prop.title);
+              }
+            }
+          });
+        });
+      });
+
+      this.rowMetrics = Array.from(dynamicFullMetricsMap.keys()).map(
+        (title) => ({
+          label: title,
+          key: title,
+        }),
+      );
     }
 
     // Title - removed per user request
@@ -80,7 +155,7 @@ class TableView {
     const thead = document.createElement("thead");
 
     // Build columns data (each combination becomes a column)
-    const columns = this.buildColumns(data, filter);
+    const columns = this.buildColumns(data, filter, compactMode);
 
     // Apply sorting
     if (this.sortColumn !== -1) {
@@ -171,101 +246,80 @@ class TableView {
   }
 
   /**
-   * Build table columns from data (transposed structure)
+   * Extract data into a flat array of columns
    */
-  buildColumns(data, filter) {
+  buildColumns(data, filter, compactMode) {
     const columns = [];
-    const normalizedFilter = this.model.normalizeKey(filter || "");
-    const company = data.company || "Unknown";
-    const product = data.name || "Unknown";
+    const normalizedFilter = this.model.normalizeKey(filter);
+    const company = data.company?.value || data.company || "Unknown";
+    const product = data.name?.value || data.name || "Unknown";
 
     const anchorSizes = data.anchorSizes || [];
 
     anchorSizes.forEach((a) => {
-      const anchorSizeData = a["Anchor Size"] || a.anchorSize || a || {};
-      const anchorSize =
-        anchorSizeData.value ||
-        anchorSizeData["value"] ||
-        anchorSizeData.anchorSize ||
-        "n/a";
-      const drillBit =
-        anchorSizeData["Drill Bit Diameter"] || anchorSizeData.drill || "-";
-      const hefs = anchorSizeData["Effective Embedment Depth (hef)"] || [];
+      const anchorSize = a.value || "n/a";
+      const drillBit = a.drillBitDiameter?.value || "-";
+      const hefs = a.effectiveEmbedmentDepths || [];
 
       hefs.forEach((h) => {
-        // Extract all values for this combination
-        const values = {
-          anchorSize: anchorSize,
-          drillBit: drillBit,
-          hef: this.model.formatNumber(h.value),
-          hnom: this.model.formatNumber(
-            h["Nominal Embedment Depth (hnom)"] || h.hnom,
-          ),
-          hhole: this.model.formatNumber(
-            h["Minimum Hole Depth (hhole)"] || h.hhole,
-          ),
-          cracked: h["Cracked Concrete Data"] ? "yes" : "no",
-          seismic: h["Seismic Categories"] || h.Seismic || "-",
-          category: h["Anchor Category"] || h.Anchor || "-",
-          φNsa: this.model.formatNumber(
-            this.model.getField(h, [
-              "Tension Steel Strength (φNsa)",
-              "tensionSteelStrength",
-              "φNsa",
-              "ϕNsa",
-            ]),
-          ),
-          φNcb: this.model.formatNumber(
-            this.model.getField(h, [
-              "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)",
-              "φNcb",
-              "ϕNcb",
-            ]),
-          ),
-          φNcb_cr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Tension Breakout Strength - Cracked Concrete (φNcb,cr)",
-              "φNcb_cr",
-              "φNcb,cr",
-            ]),
-          ),
-          φNp_uncr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Pullout Strength - Uncracked Concrete (φNp,uncr)",
-              "φNp",
-              "ϕNp",
-            ]),
-          ),
-          φNp_cr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Pullout Strength - Cracked Concrete (φNp,cr)",
-              "φNp_cr",
-              "φNp,cr",
-            ]),
-          ),
-          φVsa: this.model.formatNumber(
-            this.model.getField(h, [
-              "Shear Steel Strength (φVsa)",
-              "shearSteelStrength",
-              "φVsa",
-              "ϕVsa",
-            ]),
-          ),
-          φVcp_uncr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Pryout Strength - Uncracked Concrete (φVcp,uncr)",
-              "φVcp",
-              "φVcp_uncr",
-            ]),
-          ),
-          φVcp_cr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Pryout Strength - Cracked Concrete (φVcp,cr)",
-              "φVcp_cr",
-              "φVcp,cr",
-            ]),
-          ),
-        };
+        let values = {};
+
+        const paramLookup = new Map();
+
+        // Product parameters
+        Object.values(data).forEach((prop) => {
+          if (
+            prop &&
+            prop.constructor &&
+            prop.constructor.name === "Parameter" &&
+            prop.title
+          ) {
+            paramLookup.set(prop.title, prop.value);
+          }
+        });
+
+        // AnchorSize parameter
+        if (
+          a.value &&
+          a.value.constructor &&
+          a.value.constructor.name === "Parameter" &&
+          a.value.title
+        ) {
+          paramLookup.set(a.value.title, a.value.value);
+        }
+
+        // EffectiveEmbedmentDepth parameters
+        Object.values(h).forEach((prop) => {
+          if (
+            prop &&
+            prop.constructor &&
+            prop.constructor.name === "Parameter" &&
+            prop.title
+          ) {
+            paramLookup.set(prop.title, prop.value);
+          }
+        });
+
+        this.rowMetrics.forEach((metric) => {
+          let rawVal = paramLookup.get(metric.label);
+          if (typeof rawVal === "boolean") {
+            rawVal = rawVal ? "yes" : "no";
+          }
+
+          if (rawVal === null || rawVal === undefined) {
+            rawVal = "-";
+          }
+
+          values[metric.key] =
+            typeof rawVal === "number" ||
+            (!isNaN(rawVal) &&
+              rawVal !== "-" &&
+              rawVal !== "yes" &&
+              rawVal !== "no" &&
+              String(rawVal).trim() !== "")
+              ? this.model.formatNumber(rawVal)
+              : rawVal;
+        });
 
         // Filter check - search across all values
         if (normalizedFilter) {

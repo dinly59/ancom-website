@@ -3,7 +3,7 @@
  */
 class AnchorSize {
   constructor(data = {}, parentContext = {}) {
-    this.value = data.value || null;
+    this.value = new Parameter("Anchor Size", data.value || null);
     this.effectiveEmbedmentDepths = [];
 
     // Parse embedment depths
@@ -13,22 +13,8 @@ class AnchorSize {
         new EffectiveEmbedmentDepth(hef, {
           productName: parentContext.productName,
           filename: parentContext.filename,
-          anchorSize: this.value,
+          anchorSize: this.value.value,
         }),
     );
-  }
-
-  /**
-   * Get embedment depth by value
-   */
-  getEmbedmentByValue(val) {
-    return this.effectiveEmbedmentDepths.find((e) => e.value === val);
-  }
-
-  /**
-   * Get all embedment depth values
-   */
-  getEmbedmentValues() {
-    return this.effectiveEmbedmentDepths.map((e) => e.value);
   }
 }

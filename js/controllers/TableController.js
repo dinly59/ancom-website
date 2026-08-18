@@ -106,7 +106,7 @@ class TableController {
 
     this.view.showLoading();
     try {
-      const data = await this.model.loadProduct(filename);
+      const data = await this.model.loadProductSchema(filename);
       this.currentProduct = filename;
       this.view.resetPage();
       this.renderTable(data);
@@ -142,6 +142,7 @@ class TableController {
   handleCompactToggle(e) {
     const compactMode = e.target.checked;
     document.documentElement.classList.toggle("compact", compactMode);
+    this.reloadCurrentProduct();
   }
 
   /**
@@ -182,7 +183,7 @@ class TableController {
     if (!this.currentProduct) return;
 
     try {
-      const data = await this.model.loadProduct(this.currentProduct);
+      const data = await this.model.loadProductSchema(this.currentProduct);
       this.renderTable(data);
     } catch (e) {
       this.view.showError(e.message);
@@ -193,6 +194,7 @@ class TableController {
    * Render table with current filter
    */
   renderTable(data) {
-    this.view.render(data, this.currentFilter);
+    const compactMode = this.compactToggle?.checked || false;
+    this.view.render(data, this.currentFilter, compactMode);
   }
 }

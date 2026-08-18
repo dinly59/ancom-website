@@ -100,7 +100,7 @@ class CompareView {
       const th = document.createElement("th");
       th.className =
         "px-4 py-3 text-left text-xs font-semibold text-slate-700 bg-slate-100 border-b-2 border-slate-300 uppercase";
-      th.textContent = data.name || "Product";
+      th.textContent = data.name?.value || data.name || "Product";
       headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -114,7 +114,7 @@ class CompareView {
       tbody,
       "Company",
       productsData,
-      (data) => data.company || "-",
+      (data) => data.company?.value || data.company || "-",
     );
 
     // Anchor size count row
