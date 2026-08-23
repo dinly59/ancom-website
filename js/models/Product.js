@@ -11,7 +11,10 @@ class Product {
       "Product Image",
       data.productImage || data["Product Image"] || null,
     );
-    this.anchorType = data.anchorType || null;
+    this.anchorType = new Parameter(
+      "Anchor Type",
+      data.anchorType || data["Anchor Type"] || null,
+    );
     this.evaluationReport = new Parameter(
       "Evaluation Report",
       data.evaluationReport || null,
@@ -42,6 +45,8 @@ class Product {
 
     return "Unnamed Product";
   }
+
+
 
   /**
    * Get all anchor sizes

@@ -90,23 +90,7 @@ class TableView {
     } else {
       const dynamicFullMetricsMap = new Map();
 
-      // Collect parameters from Product (data), excluding Manufacturer Name and Product which are displayed in the header
-      Object.values(data).forEach((prop) => {
-        if (
-          prop &&
-          prop.constructor &&
-          prop.constructor.name === "Parameter" &&
-          prop.title &&
-          prop.title !== "Manufacturer Name" &&
-          prop.title !== "Product"
-        ) {
-          if (!dynamicFullMetricsMap.has(prop.title)) {
-            dynamicFullMetricsMap.set(prop.title, prop.title);
-          }
-        }
-      });
-
-      // Collect parameters from AnchorSizes and EffectiveEmbedmentDepths
+      // Collect parameters from AnchorSizes and EffectiveEmbedmentDepths for body rows
       const anchorSizes = data.anchorSizes || [];
       anchorSizes.forEach((a) => {
         if (
@@ -168,39 +152,127 @@ class TableView {
     const start = (this.currentPage - 1) * this.PAGE_SIZE;
     const pagedColumns = columns.slice(start, start + this.PAGE_SIZE);
 
-    // Header row 1: Company names with colspan
-    const companyRow = document.createElement("tr");
-    const emptyTh1 = document.createElement("th");
-    emptyTh1.textContent = "Manufacturer Name";
-    emptyTh1.className = "metric-header";
-    companyRow.appendChild(emptyTh1);
+    // Detailed manual rendering of exact 7 header rows in specified order:
+    // 1. Manufacturer Name
+    const row1 = document.createElement("tr");
+    const labelTd1 = document.createElement("td");
+    labelTd1.textContent = data.company.title;
+    labelTd1.className = "metric-header metric-label";
+    labelTd1.style.fontWeight = "bold";
+    row1.appendChild(labelTd1);
 
-    // Group consecutive columns by company
-    const companyGroups = this.groupByField(pagedColumns, "company");
-    companyGroups.forEach((group) => {
-      const th = document.createElement("th");
-      th.textContent = group.value || "N/A";
-      th.colSpan = group.count;
-      companyRow.appendChild(th);
+    this.groupByField(pagedColumns, "company").forEach((group) => {
+      const td = document.createElement("td");
+      td.textContent = group.value || "-";
+      td.colSpan = group.count;
+      row1.appendChild(td);
     });
-    thead.appendChild(companyRow);
+    thead.appendChild(row1);
 
-    // Header row 2: Product names with colspan
-    const productRow = document.createElement("tr");
-    const emptyTh2 = document.createElement("th");
-    emptyTh2.textContent = "Product";
-    emptyTh2.className = "metric-header";
-    productRow.appendChild(emptyTh2);
+    // 2. Product
+    const row2 = document.createElement("tr");
+    const labelTd2 = document.createElement("td");
+    labelTd2.textContent = data.name.title;
+    labelTd2.className = "metric-header metric-label";
+    labelTd2.style.fontWeight = "bold";
+    row2.appendChild(labelTd2);
 
-    // Group consecutive columns by product
-    const productGroups = this.groupByField(pagedColumns, "product");
-    productGroups.forEach((group) => {
-      const th = document.createElement("th");
-      th.textContent = group.value || "N/A";
-      th.colSpan = group.count;
-      productRow.appendChild(th);
+    this.groupByField(pagedColumns, "product").forEach((group) => {
+      const td = document.createElement("td");
+      td.textContent = group.value || "-";
+      td.colSpan = group.count;
+      row2.appendChild(td);
     });
-    thead.appendChild(productRow);
+    thead.appendChild(row2);
+
+    // 3. Material
+    const row3 = document.createElement("tr");
+    const labelTd3 = document.createElement("td");
+    labelTd3.textContent = data.material.title;
+    labelTd3.className = "metric-header metric-label";
+    labelTd3.style.fontWeight = "bold";
+    row3.appendChild(labelTd3);
+
+    this.groupByField(pagedColumns, "material").forEach((group) => {
+      const td = document.createElement("td");
+      td.textContent = group.value || "-";
+      td.colSpan = group.count;
+      row3.appendChild(td);
+    });
+    thead.appendChild(row3);
+
+    // 4. Product Image
+    const row4 = document.createElement("tr");
+    const labelTd4 = document.createElement("td");
+    labelTd4.textContent = data.productImage.title;
+    labelTd4.className = "metric-header metric-label";
+    labelTd4.style.fontWeight = "bold";
+    row4.appendChild(labelTd4);
+
+    this.groupByField(pagedColumns, "productImage").forEach((group) => {
+      const td = document.createElement("td");
+      if (group.value && group.value !== "-") {
+        const img = document.createElement("img");
+        img.src = group.value;
+        img.alt = "Product Image";
+        img.className = "h-12 object-contain mx-auto";
+        td.appendChild(img);
+      } else {
+        td.textContent = "-";
+      }
+      td.colSpan = group.count;
+      row4.appendChild(td);
+    });
+    thead.appendChild(row4);
+
+    // 5. Evaluation Report
+    const row5 = document.createElement("tr");
+    const labelTd5 = document.createElement("td");
+    labelTd5.textContent = data.evaluationReport.title;
+    labelTd5.className = "metric-header metric-label";
+    labelTd5.style.fontWeight = "bold";
+    row5.appendChild(labelTd5);
+
+    this.groupByField(pagedColumns, "evaluationReport").forEach((group) => {
+      const td = document.createElement("td");
+      td.textContent = group.value || "-";
+      td.colSpan = group.count;
+      row5.appendChild(td);
+    });
+    thead.appendChild(row5);
+
+    // 6. Date Issued or Renewed
+    const row6 = document.createElement("tr");
+    const labelTd6 = document.createElement("td");
+    labelTd6.textContent = data.dateIssued.title;
+    labelTd6.className = "metric-header metric-label";
+    labelTd6.style.fontWeight = "bold";
+    row6.appendChild(labelTd6);
+
+    this.groupByField(pagedColumns, "dateIssued").forEach((group) => {
+      const td = document.createElement("td");
+      td.textContent = group.value || "-";
+      td.colSpan = group.count;
+      row6.appendChild(td);
+    });
+    thead.appendChild(row6);
+
+    // 7. Date Expires
+    const row7 = document.createElement("tr");
+    const labelTd7 = document.createElement("td");
+    labelTd7.textContent = data.dateExpires.title;
+    labelTd7.className = "metric-header metric-label";
+    labelTd7.style.fontWeight = "bold";
+    row7.appendChild(labelTd7);
+
+    this.groupByField(pagedColumns, "dateExpires").forEach((group) => {
+      const td = document.createElement("td");
+      td.textContent = group.value || "-";
+      td.colSpan = group.count;
+      row7.appendChild(td);
+    });
+    thead.appendChild(row7);
+
     table.appendChild(thead);
 
     // Body - each row is a metric
@@ -208,10 +280,10 @@ class TableView {
     this.rowMetrics.forEach((metric, metricIdx) => {
       const row = document.createElement("tr");
 
-      // Metric label (first column) - clickable for sorting
+      // Metric label (first column)
       const labelTd = document.createElement("td");
       labelTd.innerHTML = metric.label;
-      labelTd.className = "metric-label";
+      labelTd.className = "metric-header metric-label";
       labelTd.style.fontWeight = "bold";
       labelTd.style.cursor = "pointer";
       labelTd.title = "Click to sort columns by this metric";
@@ -253,6 +325,13 @@ class TableView {
     const normalizedFilter = this.model.normalizeKey(filter);
     const company = data.company?.value || data.company || "Unknown";
     const product = data.name?.value || data.name || "Unknown";
+    const material = data.material?.value || data.material || "-";
+    const anchorType = data.anchorType?.value || data.anchorType || "-";
+    const productImage = data.productImage?.value || data.productImage || "-";
+    const evaluationReport =
+      data.evaluationReport?.value || data.evaluationReport || "-";
+    const dateIssued = data.dateIssued?.value || data.dateIssued || "-";
+    const dateExpires = data.dateExpires?.value || data.dateExpires || "-";
 
     const anchorSizes = data.anchorSizes || [];
 
@@ -324,7 +403,21 @@ class TableView {
         // Filter check - search across all values
         if (normalizedFilter) {
           const columnText = this.model.normalizeKey(
-            company + " " + product + " " + Object.values(values).join(" "),
+            company +
+              " " +
+              product +
+              " " +
+              material +
+              " " +
+              anchorType +
+              " " +
+              evaluationReport +
+              " " +
+              dateIssued +
+              " " +
+              dateExpires +
+              " " +
+              Object.values(values).join(" "),
           );
           if (!columnText.includes(normalizedFilter)) return;
         }
@@ -332,6 +425,12 @@ class TableView {
         columns.push({
           company: company,
           product: product,
+          material: material,
+          anchorType: anchorType,
+          productImage: productImage,
+          evaluationReport: evaluationReport,
+          dateIssued: dateIssued,
+          dateExpires: dateExpires,
           values: values,
         });
       });
