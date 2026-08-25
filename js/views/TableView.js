@@ -13,6 +13,67 @@ class TableView {
   }
 
   /**
+   * Determine category group for a metric label (Tailwind UI grouped rows)
+   */
+  getMetricCategory(label) {
+    if (!label) return "General & Installation Specifications";
+    const t = label.toLowerCase();
+    if (
+      t.includes("tension") ||
+      t.includes("pullout") ||
+      t.includes("breakout") ||
+      t.includes("ductility")
+    ) {
+      return "Tension Design Specifications";
+    }
+    if (
+      t.includes("shear") ||
+      t.includes("pryout") ||
+      t.includes("vsa") ||
+      t.includes("vcp")
+    ) {
+      return "Shear Design Specifications";
+    }
+    return "General & Installation Specifications";
+  }
+
+  /**
+   * Format technical notation into HTML subscripts (e.g. hef -> h<sub>ef</sub>, Np,uncr -> N<sub>p,uncr</sub>)
+   */
+  formatLabelWithSubscripts(label) {
+    if (!label) return "";
+    if (label.includes("<sub>")) return label;
+
+    return label
+      // Compound subscripts with commas (must match first before simpler terms)
+      .replace(/\bNp,uncr\b/g, "N<sub>p,uncr</sub>")
+      .replace(/\bNp,cr\b/g, "N<sub>p,cr</sub>")
+      .replace(/\bNp,eq\b/g, "N<sub>p,eq</sub>")
+      .replace(/\bNcb,uncr\b/g, "N<sub>cb,uncr</sub>")
+      .replace(/\bNcb,cr\b/g, "N<sub>cb,cr</sub>")
+      .replace(/\bVcp,uncr\b/g, "V<sub>cp,uncr</sub>")
+      .replace(/\bVcp,cr\b/g, "V<sub>cp,cr</sub>")
+      .replace(/\bVsa,eq\b/g, "V<sub>sa,eq</sub>")
+      // Simple single-term subscripts
+      .replace(/\bhef\b/g, "h<sub>ef</sub>")
+      .replace(/\bhnom\b/g, "h<sub>nom</sub>")
+      .replace(/\bhhole\b/g, "h<sub>hole</sub>")
+      .replace(/\bcmin\b/g, "c<sub>min</sub>")
+      .replace(/\bsmin\b/g, "s<sub>min</sub>")
+      .replace(/\bhmin\b/g, "h<sub>min</sub>")
+      .replace(/\bNsa\b/g, "N<sub>sa</sub>")
+      .replace(/\bVsa\b/g, "V<sub>sa</sub>")
+      .replace(/\bNcb\b/g, "N<sub>cb</sub>")
+      .replace(/\bVcb\b/g, "V<sub>cb</sub>")
+      .replace(/\bVcp\b/g, "V<sub>cp</sub>")
+      .replace(/\bNp\b/g, "N<sub>p</sub>")
+      .replace(/\bkuncr\b/g, "k<sub>uncr</sub>")
+      .replace(/\bkcr\b/g, "k<sub>cr</sub>")
+      .replace(/\bkcp\b/g, "k<sub>cp</sub>")
+      .replace(/\bf'c\b/g, "f'<sub>c</sub>");
+  }
+
+  /**
    * Show loading state
    */
   showLoading() {
@@ -58,29 +119,29 @@ class TableView {
 
       const compactParams = sampleHef
         ? [
-            sampleAnchor?.value,
-            sampleHef.drillBitDiameter,
-            sampleHef.value,
-            sampleHef.nominalEmbedmentDepth,
-            sampleHef.minimumHoleDepth,
-            sampleHef.crackedConcreteData,
-            sampleHef.seismicCategories,
-            sampleHef.anchorCategory,
-            sampleHef.tensionSteelStrength,
-            sampleHef.tensionBreakoutUncracked,
-            sampleHef.tensionBreakoutCracked,
-            sampleHef.pulloutUncracked,
-            sampleHef.pulloutCracked,
-            sampleHef.shearSteelStrength,
-            sampleHef.pryoutUncracked,
-            sampleHef.pryoutCracked,
-          ].filter(
-            (p) =>
-              p &&
-              p.constructor &&
-              p.constructor.name === "Parameter" &&
-              p.title,
-          )
+          sampleAnchor?.value,
+          sampleHef.drillBitDiameter,
+          sampleHef.value,
+          sampleHef.nominalEmbedmentDepth,
+          sampleHef.minimumHoleDepth,
+          sampleHef.crackedConcreteData,
+          sampleHef.seismicCategories,
+          sampleHef.anchorCategory,
+          sampleHef.tensionSteelStrength,
+          sampleHef.tensionBreakoutUncracked,
+          sampleHef.tensionBreakoutCracked,
+          sampleHef.pulloutUncracked,
+          sampleHef.pulloutCracked,
+          sampleHef.shearSteelStrength,
+          sampleHef.pryoutUncracked,
+          sampleHef.pryoutCracked,
+        ].filter(
+          (p) =>
+            p &&
+            p.constructor &&
+            p.constructor.name === "Parameter" &&
+            p.title,
+        )
         : [];
 
       this.rowMetrics = compactParams.map((p) => ({
@@ -90,23 +151,7 @@ class TableView {
     } else {
       const dynamicFullMetricsMap = new Map();
 
-      // Collect parameters from Product (data), excluding Manufacturer Name and Product which are displayed in the header
-      Object.values(data).forEach((prop) => {
-        if (
-          prop &&
-          prop.constructor &&
-          prop.constructor.name === "Parameter" &&
-          prop.title &&
-          prop.title !== "Manufacturer Name" &&
-          prop.title !== "Product"
-        ) {
-          if (!dynamicFullMetricsMap.has(prop.title)) {
-            dynamicFullMetricsMap.set(prop.title, prop.title);
-          }
-        }
-      });
-
-      // Collect parameters from AnchorSizes and EffectiveEmbedmentDepths
+      // Collect parameters from AnchorSizes and EffectiveEmbedmentDepths for body rows
       const anchorSizes = data.anchorSizes || [];
       anchorSizes.forEach((a) => {
         if (
@@ -152,7 +197,6 @@ class TableView {
     wrapper.className = "table-scroll";
 
     const table = document.createElement("table");
-    const thead = document.createElement("thead");
 
     // Build columns data (each combination becomes a column)
     const columns = this.buildColumns(data, filter, compactMode);
@@ -168,71 +212,97 @@ class TableView {
     const start = (this.currentPage - 1) * this.PAGE_SIZE;
     const pagedColumns = columns.slice(start, start + this.PAGE_SIZE);
 
-    // Header row 1: Company names with colspan
-    const companyRow = document.createElement("tr");
-    const emptyTh1 = document.createElement("th");
-    emptyTh1.textContent = "Manufacturer Name";
-    emptyTh1.className = "metric-header";
-    companyRow.appendChild(emptyTh1);
-
-    // Group consecutive columns by company
-    const companyGroups = this.groupByField(pagedColumns, "company");
-    companyGroups.forEach((group) => {
-      const th = document.createElement("th");
-      th.textContent = group.value || "N/A";
-      th.colSpan = group.count;
-      companyRow.appendChild(th);
-    });
-    thead.appendChild(companyRow);
-
-    // Header row 2: Product names with colspan
-    const productRow = document.createElement("tr");
-    const emptyTh2 = document.createElement("th");
-    emptyTh2.textContent = "Product";
-    emptyTh2.className = "metric-header";
-    productRow.appendChild(emptyTh2);
-
-    // Group consecutive columns by product
-    const productGroups = this.groupByField(pagedColumns, "product");
-    productGroups.forEach((group) => {
-      const th = document.createElement("th");
-      th.textContent = group.value || "N/A";
-      th.colSpan = group.count;
-      productRow.appendChild(th);
-    });
-    thead.appendChild(productRow);
-    table.appendChild(thead);
-
-    // Body - each row is a metric
+    // Single tbody — no thead, everything is a plain td row
     const tbody = document.createElement("tbody");
-    this.rowMetrics.forEach((metric, metricIdx) => {
+
+    // ── Group 1: Product Information ─────────────────────────
+    const addGroupHeader = (label) => {
+      const groupRow = document.createElement("tr");
+      groupRow.className = "group-header-row";
+      const groupTd = document.createElement("td");
+      groupTd.colSpan = pagedColumns.length + 1;
+      groupTd.className = "group-header-cell";
+      groupTd.textContent = label;
+      groupRow.appendChild(groupTd);
+      tbody.appendChild(groupRow);
+    };
+
+    const addInfoRow = (title, field) => {
       const row = document.createElement("tr");
-
-      // Metric label (first column) - clickable for sorting
       const labelTd = document.createElement("td");
-      labelTd.innerHTML = metric.label;
-      labelTd.className = "metric-label";
-      labelTd.style.fontWeight = "bold";
-      labelTd.style.cursor = "pointer";
-      labelTd.title = "Click to sort columns by this metric";
-      if (this.sortColumn === metricIdx) {
-        labelTd.innerHTML += this.sortAscending ? " ▲" : " ▼";
-      }
-      labelTd.addEventListener("click", () => this.onSort(metricIdx));
+      labelTd.textContent = title;
+      labelTd.className = "metric-header metric-label";
       row.appendChild(labelTd);
-
-      // Data cells for each column
-      pagedColumns.forEach((col) => {
+      this.groupByField(pagedColumns, field).forEach((group) => {
         const td = document.createElement("td");
-        // Use plain text for data-label (remove HTML tags)
-        const plainLabel = metric.label.replace(/<[^>]*>/g, "");
-        td.setAttribute("data-label", plainLabel);
-        td.textContent = col.values[metric.key] || "-";
+        td.textContent = group.value || "-";
+        td.colSpan = group.count;
         row.appendChild(td);
       });
-
       tbody.appendChild(row);
+    };
+
+    addGroupHeader("Product Information");
+    addInfoRow(data.company.title,          "company");
+    addInfoRow(data.name.title,             "product");
+    addInfoRow(data.material.title,         "material");
+    addInfoRow(data.evaluationReport.title, "evaluationReport");
+    addInfoRow(data.dateIssued.title,       "dateIssued");
+    addInfoRow(data.dateExpires.title,      "dateExpires");
+
+    // ── Groups 2+: metric sections (General, Tension, Shear …) ──
+    const categoriesMap = new Map();
+    this.rowMetrics.forEach((metric, metricIdx) => {
+      const cat = this.getMetricCategory(metric.label);
+      if (!categoriesMap.has(cat)) categoriesMap.set(cat, []);
+      categoriesMap.get(cat).push({ metric, metricIdx });
     });
+
+    categoriesMap.forEach((items, categoryName) => {
+      addGroupHeader(categoryName);
+
+      items.forEach(({ metric, metricIdx }) => {
+        const row = document.createElement("tr");
+
+        // First column — metric label
+        const labelTd = document.createElement("td");
+        labelTd.innerHTML = this.formatLabelWithSubscripts(metric.label);
+        labelTd.className = "metric-header metric-label";
+        labelTd.style.cursor = "pointer";
+        labelTd.title = "Click to sort columns by this metric";
+        if (this.sortColumn === metricIdx) {
+          labelTd.innerHTML += this.sortAscending ? " ▲" : " ▼";
+        }
+        labelTd.addEventListener("click", () => this.onSort(metricIdx));
+        row.appendChild(labelTd);
+
+        // Data cells (merge adjacent for Head Type)
+        const isHeadType =
+          metric.key && metric.key.toLowerCase().includes("head type");
+        if (isHeadType) {
+          const groups = this.groupByMetricValue(pagedColumns, metric.key);
+          groups.forEach((group) => {
+            const td = document.createElement("td");
+            const plainLabel = metric.label.replace(/<[^>]*>/g, "");
+            td.setAttribute("data-label", plainLabel);
+            td.textContent = group.value || "-";
+            if (group.count > 1) td.colSpan = group.count;
+            row.appendChild(td);
+          });
+        } else {
+          pagedColumns.forEach((col) => {
+            const td = document.createElement("td");
+            const plainLabel = metric.label.replace(/<[^>]*>/g, "");
+            td.setAttribute("data-label", plainLabel);
+            td.textContent = col.values[metric.key] || "-";
+            row.appendChild(td);
+          });
+        }
+
+        tbody.appendChild(row);
+      });
+    });
+
     table.appendChild(tbody);
 
     // Column count - removed per user request
@@ -253,6 +323,12 @@ class TableView {
     const normalizedFilter = this.model.normalizeKey(filter);
     const company = data.company?.value || data.company || "Unknown";
     const product = data.name?.value || data.name || "Unknown";
+    const material = data.material?.value || data.material || "-";
+    const anchorType = data.anchorType?.value || data.anchorType || "-";
+    const evaluationReport =
+      data.evaluationReport?.value || data.evaluationReport || "-";
+    const dateIssued = data.dateIssued?.value || data.dateIssued || "-";
+    const dateExpires = data.dateExpires?.value || data.dateExpires || "-";
 
     const anchorSizes = data.anchorSizes || [];
 
@@ -312,11 +388,11 @@ class TableView {
 
           values[metric.key] =
             typeof rawVal === "number" ||
-            (!isNaN(rawVal) &&
-              rawVal !== "-" &&
-              rawVal !== "yes" &&
-              rawVal !== "no" &&
-              String(rawVal).trim() !== "")
+              (!isNaN(rawVal) &&
+                rawVal !== "-" &&
+                rawVal !== "yes" &&
+                rawVal !== "no" &&
+                String(rawVal).trim() !== "")
               ? this.model.formatNumber(rawVal)
               : rawVal;
         });
@@ -324,7 +400,21 @@ class TableView {
         // Filter check - search across all values
         if (normalizedFilter) {
           const columnText = this.model.normalizeKey(
-            company + " " + product + " " + Object.values(values).join(" "),
+            company +
+            " " +
+            product +
+            " " +
+            material +
+            " " +
+            anchorType +
+            " " +
+            evaluationReport +
+            " " +
+            dateIssued +
+            " " +
+            dateExpires +
+            " " +
+            Object.values(values).join(" "),
           );
           if (!columnText.includes(normalizedFilter)) return;
         }
@@ -332,6 +422,11 @@ class TableView {
         columns.push({
           company: company,
           product: product,
+          material: material,
+          anchorType: anchorType,
+          evaluationReport: evaluationReport,
+          dateIssued: dateIssued,
+          dateExpires: dateExpires,
           values: values,
         });
       });
@@ -386,6 +481,31 @@ class TableView {
     // Push the last group
     groups.push({ value: currentValue, count: count });
 
+    return groups;
+  }
+
+  /**
+   * Group consecutive columns by values[metricKey] (for colspan merging in body rows)
+   */
+  groupByMetricValue(columns, metricKey) {
+    if (!columns || columns.length === 0) return [];
+
+    const groups = [];
+    let currentValue = columns[0].values?.[metricKey];
+    let count = 1;
+
+    for (let i = 1; i < columns.length; i++) {
+      const val = columns[i].values?.[metricKey];
+      if (val === currentValue) {
+        count++;
+      } else {
+        groups.push({ value: currentValue, count: count });
+        currentValue = val;
+        count = 1;
+      }
+    }
+
+    groups.push({ value: currentValue, count: count });
     return groups;
   }
 
