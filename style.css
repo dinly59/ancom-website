@@ -19,6 +19,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -41,71 +42,151 @@
   @apply text-slate-600 text-sm px-6 py-3 bg-slate-50 border-b border-slate-200 font-medium;
 }
 
-.pagination { @apply flex items-center gap-2 px-6 py-3 bg-white border-t border-slate-200; }
-.pagination button { @apply px-3 py-1 bg-slate-100 rounded hover:bg-slate-200; }
-.pagination #pageInfo { @apply text-sm text-slate-600; }
+.pagination {
+  @apply flex items-center gap-2 px-6 py-3 bg-white border-t border-slate-200;
+}
 
-/* Table styles */
+.pagination button {
+  @apply px-3 py-1 bg-slate-100 rounded hover:bg-slate-200;
+}
+
+.pagination #pageInfo {
+  @apply text-sm text-slate-600;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TABLE — Simpson Strong-Tie Theme
+   Brand Orange: #DF4907  |  Black: #1a1a1a  |  Gray: #555
+   ═══════════════════════════════════════════════════════ */
+
+/* Table heading */
 #tableContainer h2 {
-  @apply text-2xl font-bold text-slate-800 px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-slate-50;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  padding: 1rem 1.25rem;
+  border-bottom: 3px solid #DF4907;
+  background-color: #ffffff;
+  letter-spacing: 0.01em;
 }
 
-#tableContainer table {
-  @apply w-full border-collapse;
-  min-width: 100%;
-  margin: 0 auto;
-  table-layout: fixed;
-  border: 2px solid #cbd5e1;
-}
-
-/* horizontal scroll wrapper */
-.table-scroll { 
+/* Scroll wrapper */
+.table-scroll {
   overflow-x: auto;
   width: 100%;
-  border: 2px solid #cbd5e1;
-  border-radius: 8px;
+  border-radius: 4px;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #d0d0d0;
 }
 
 #tableContainer {
   @apply mx-auto;
 }
 
-/* compact mode */
-.compact #tableContainer td, .compact #tableContainer th {
-  @apply px-2 py-2 text-xs;
+#tableContainer table {
+  @apply w-full border-collapse;
+  min-width: 100%;
+  table-layout: fixed;
+}
+
+/* Compact mode */
+.compact #tableContainer td,
+.compact #tableContainer th {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
 }
 
 
-#tableContainer th {
-  @apply px-4 py-3 text-center text-xs font-normal text-slate-700 bg-slate-100 uppercase tracking-wider cursor-pointer hover:bg-slate-200 transition-colors sticky top-0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border: 1px solid #cbd5e1;
-}
-
-#tableContainer th:hover {
-  @apply bg-blue-50;
-}
-
+/* ── tbody data cells ────────────────────────────────── */
 #tableContainer td {
-  @apply px-4 py-3 text-sm font-normal text-slate-700 text-center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #1a1a1a;
   vertical-align: middle;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border: 2px solid #e2e8f0;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0ece8;  /* very warm light divider */
+  border-right: 1px solid #f8f5f2;  /* barely-there warm right border */
 }
 
+/* Force center for all regular cells */
+#tableContainer th,
+#tableContainer td {
+  text-align: center !important;
+}
+
+/* Alternating row — very faint warm tint instead of gray */
+#tableContainer tbody tr:nth-child(even) td {
+  background-color: #fffaf6; /* barely-there warm orange tint */
+}
+
+/* Hover — slightly stronger warm tint */
 #tableContainer tbody tr {
-  @apply hover:bg-blue-50 transition-colors;
+  transition: background-color 100ms ease;
 }
 
-#tableContainer tbody tr:nth-child(even) {
-  @apply bg-slate-50;
+#tableContainer tbody tr:hover td {
+  background-color: #fff3e8 !important; /* light orange tint on hover */
 }
 
-/* Mobile responsive table */
+/* ── Group section header rows (Simpson style) ───────── */
+#tableContainer tr.group-header-row td {
+  background-color: #fff5ee !important; /* very light warm orange — not gray */
+  color: #DF4907 !important;
+  font-size: 0.6875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: left !important;
+  padding: 0.4rem 1rem !important;
+  border-top: 2px solid #f0b99e; /* Softened warm peach (much less glaring than bright orange) */
+  border-bottom: 1px solid #ffe0cc;
+}
+
+/* ── First column: metric label ──────────────────────── */
+#tableContainer td.metric-header,
+#tableContainer td.metric-label {
+  background-color: #fffbf8 !important; /* warm near-white, not gray */
+  color: #1a1a1a !important;
+  text-align: left !important;
+  font-size: 0.8125rem;
+  font-weight: 600 !important;
+  line-height: 1.45;
+  white-space: normal !important;
+  word-break: break-word;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #f0ece8;
+  border-right: 3px solid #f0b99e; /* Softened warm peach to reduce glare */
+}
+
+/* Metric label on alternating (even) rows */
+#tableContainer tbody tr:nth-child(even) td.metric-header,
+#tableContainer tbody tr:nth-child(even) td.metric-label {
+  background-color: #fff5ee !important; /* matches even-row warm tint */
+}
+
+/* Metric label hover */
+#tableContainer tbody tr:hover td.metric-header,
+#tableContainer tbody tr:hover td.metric-label {
+  background-color: #fdf0e8 !important; /* faint orange tint */
+}
+
+
+
+/* Subscript styling */
+#tableContainer td.metric-label sub {
+  font-size: 0.78em;
+  vertical-align: baseline;
+  position: relative;
+  bottom: -0.22em;
+}
+
+/* ── Mobile responsive ───────────────────────────────── */
 @media (max-width: 768px) {
   #tableContainer table,
   #tableContainer thead,
@@ -121,70 +202,40 @@
   }
 
   #tableContainer tr {
-    @apply mb-4 border border-slate-200 rounded-lg shadow-sm overflow-hidden;
+    margin-bottom: 1rem;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    overflow: hidden;
   }
 
   #tableContainer td {
-    @apply flex flex-col justify-center items-center px-4 py-3 border-b border-slate-100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #ececec;
     position: relative;
-    padding-left: 12px;
-    /* allow wrapping on mobile stacked view */
     white-space: normal;
+    background-color: #fff;
   }
 
   #tableContainer td::before {
     content: attr(data-label);
-    @apply absolute left-1/2 transform -translate-x-1/2 -translate-y-4 font-semibold text-slate-600 text-xs uppercase;
+    position: absolute;
     top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #DF4907;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
     white-space: nowrap;
   }
 
   #tableContainer td:last-child {
-    @apply border-b-0;
+    border-bottom: none;
   }
-}
-
-#tableContainer th,
-#tableContainer td {
-  text-align: center !important;
-}
-
-/* Transposed table styles - First column is sticky metric label column */
-#tableContainer td.metric-header,
-#tableContainer td.metric-label {
-  @apply bg-slate-100 text-slate-900 text-left;
-  font-weight: bold !important;
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  border: 2px solid #cbd5e1;
-  border-right: 2px solid #94a3b8;
-  line-height: 1.8;
-}
-
-#tableContainer td.metric-header:hover {
-  @apply bg-blue-100 text-blue-900;
-}
-
-/* Subscript styling in metric labels */
-#tableContainer td.metric-label sub {
-  font-size: 0.5em;
-  vertical-align: sub;
-}
-
-/* Product metadata data cells (columns 1..N) in thead */
-#tableContainer thead tr:first-child td:not(.metric-header):not(.metric-label) {
-  @apply bg-blue-600 text-white font-normal;
-  border: 2px solid #cbd5e1;
-  border-right: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-#tableContainer thead tr:nth-child(2) td:not(.metric-header):not(.metric-label) {
-  @apply bg-blue-100 text-blue-900 font-normal;
-  border: 1px solid #cbd5e1;
-}
-
-#tableContainer thead tr:nth-child(n+3) td:not(.metric-header):not(.metric-label) {
-  @apply bg-slate-50 text-slate-800 font-normal;
-  border: 1px solid #cbd5e1;
 }
