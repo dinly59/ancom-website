@@ -120,8 +120,8 @@ class TableView {
       const compactParams = sampleHef
         ? [
           sampleAnchor?.value,
-          sampleHef.drillBitDiameter,
           sampleHef.value,
+          sampleHef.drillBitDiameter,
           sampleHef.nominalEmbedmentDepth,
           sampleHef.minimumHoleDepth,
           sampleHef.crackedConcreteData,
@@ -243,12 +243,12 @@ class TableView {
     };
 
     addGroupHeader("Product Information");
-    addInfoRow(data.company.title,          "company");
-    addInfoRow(data.name.title,             "product");
-    addInfoRow(data.material.title,         "material");
+    addInfoRow(data.company.title, "company");
+    addInfoRow(data.name.title, "product");
+    addInfoRow(data.material.title, "material");
     addInfoRow(data.evaluationReport.title, "evaluationReport");
-    addInfoRow(data.dateIssued.title,       "dateIssued");
-    addInfoRow(data.dateExpires.title,      "dateExpires");
+    addInfoRow(data.dateIssued.title, "dateIssued");
+    addInfoRow(data.dateExpires.title, "dateExpires");
 
     // ── Groups 2+: metric sections (General, Tension, Shear …) ──
     const categoriesMap = new Map();
@@ -263,6 +263,13 @@ class TableView {
 
       items.forEach(({ metric, metricIdx }) => {
         const row = document.createElement("tr");
+
+        const metricKeyLower = (metric.key || metric.label || "").toLowerCase();
+        if (metricKeyLower.includes("anchor size")) {
+          row.classList.add("frozen-row-1");
+        } else if (metricKeyLower.includes("effective embedment depth")) {
+          row.classList.add("frozen-row-2");
+        }
 
         // First column — metric label
         const labelTd = document.createElement("td");
@@ -308,6 +315,17 @@ class TableView {
     // Column count - removed per user request
     wrapper.appendChild(table);
     this.container.appendChild(wrapper);
+
+    // Measure frozen row 1 height to align frozen row 2 perfectly beneath it
+    requestAnimationFrame(() => {
+      const row1 = table.querySelector(".frozen-row-1");
+      if (row1) {
+        const h = row1.offsetHeight;
+        if (h > 0) {
+          table.style.setProperty("--frozen-row-1-height", `${h}px`);
+        }
+      }
+    });
 
     // Pagination controls
     if (columns.length > this.PAGE_SIZE) {

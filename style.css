@@ -72,13 +72,14 @@
 
 /* Scroll wrapper */
 .table-scroll {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 72vh;
   width: 100%;
   border-radius: 4px;
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.1),
-    0 1px 3px rgba(0, 0, 0, 0.06);
-  border: 1px solid #d0d0d0;
+    0 1px 4px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
 }
 
 #tableContainer {
@@ -103,15 +104,17 @@
 #tableContainer td {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
-  color: #1a1a1a;
+  color: #1e293b;
   vertical-align: middle;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   background-color: #ffffff;
-  border-bottom: 1px solid #f0ece8;  /* very warm light divider */
-  border-right: 1px solid #f8f5f2;  /* barely-there warm right border */
+  border-bottom: 1px solid #f1f5f9;
+  /* soft neutral light divider */
+  border-right: 1px solid #f8fafc;
+  /* subtle vertical divider */
 }
 
 /* Force center for all regular cells */
@@ -120,39 +123,45 @@
   text-align: center !important;
 }
 
-/* Alternating row — very faint warm tint instead of gray */
+/* Alternating row — clean white background for open, bright aesthetic */
 #tableContainer tbody tr:nth-child(even) td {
-  background-color: #fffaf6; /* barely-there warm orange tint */
+  background-color: #ffffff;
 }
 
-/* Hover — slightly stronger warm tint */
+/* Hover — soft, eye-friendly slate highlight */
 #tableContainer tbody tr {
-  transition: background-color 100ms ease;
+  transition: background-color 120ms ease;
 }
 
 #tableContainer tbody tr:hover td {
-  background-color: #fff3e8 !important; /* light orange tint on hover */
+  background-color: #f1f5f9 !important;
+  /* soft slate-100 highlight */
 }
 
 /* ── Group section header rows (Simpson style) ───────── */
 #tableContainer tr.group-header-row td {
-  background-color: #fff5ee !important; /* very light warm orange — not gray */
-  color: #DF4907 !important;
+  background-color: #f8fafc !important;
+  /* clean neutral slate-50 */
+  color: #334155 !important;
+  /* readable slate-700 text */
   font-size: 0.6875rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-align: left !important;
-  padding: 0.4rem 1rem !important;
-  border-top: 2px solid #f0b99e; /* Softened warm peach (much less glaring than bright orange) */
-  border-bottom: 1px solid #ffe0cc;
+  padding: 0.45rem 1rem !important;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  border-left: 4px solid #DF4907;
+  /* Simpson brand orange accent indicator */
 }
 
-/* ── First column: metric label ──────────────────────── */
+/* ── First column: metric label (Orange brand anchor) ── */
 #tableContainer td.metric-header,
 #tableContainer td.metric-label {
-  background-color: #fffbf8 !important; /* warm near-white, not gray */
-  color: #1a1a1a !important;
+  background-color: #fffaf5 !important;
+  /* subtle warm ivory background */
+  color: #0f172a !important;
   text-align: left !important;
   font-size: 0.8125rem;
   font-weight: 600 !important;
@@ -160,20 +169,75 @@
   white-space: normal !important;
   word-break: break-word;
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid #f0ece8;
-  border-right: 3px solid #f0b99e; /* Softened warm peach to reduce glare */
+  border-bottom: 1px solid #f1f5f9;
+  border-left: 4px solid #DF4907;
+  /* Simpson brand orange left stripe */
+  border-right: 2px solid #fdba74;
+  /* soft peach divider to separate metric from data */
+  position: sticky;
+  left: 0;
+  z-index: 2;
 }
 
 /* Metric label on alternating (even) rows */
 #tableContainer tbody tr:nth-child(even) td.metric-header,
 #tableContainer tbody tr:nth-child(even) td.metric-label {
-  background-color: #fff5ee !important; /* matches even-row warm tint */
+  background-color: #fffaf5 !important;
 }
 
-/* Metric label hover */
+/* Metric label hover — soft warm amber tint */
 #tableContainer tbody tr:hover td.metric-header,
 #tableContainer tbody tr:hover td.metric-label {
-  background-color: #fdf0e8 !important; /* faint orange tint */
+  background-color: #ffedd5 !important;
+  /* soft orange-100 hover */
+  color: #9a3412 !important;
+}
+
+/* ── Frozen Header Rows (Anchor Size & Effective Embedment Depth) ── */
+#tableContainer tr.frozen-row-1 td {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #ffffff;
+}
+
+#tableContainer tr.frozen-row-1 td.metric-header,
+#tableContainer tr.frozen-row-1 td.metric-label {
+  position: sticky;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  background-color: #fffaf5 !important;
+}
+
+#tableContainer tr.frozen-row-2 td {
+  position: sticky;
+  top: var(--frozen-row-1-height, 37px);
+  z-index: 20;
+  background-color: #ffffff;
+}
+
+#tableContainer tr.frozen-row-2 td.metric-header,
+#tableContainer tr.frozen-row-2 td.metric-label {
+  position: sticky;
+  left: 0;
+  top: var(--frozen-row-1-height, 37px);
+  z-index: 30;
+  background-color: #fffaf5 !important;
+}
+
+/* Hover state for frozen rows */
+#tableContainer tbody tr.frozen-row-1:hover td,
+#tableContainer tbody tr.frozen-row-2:hover td {
+  background-color: #f1f5f9 !important;
+}
+
+#tableContainer tbody tr.frozen-row-1:hover td.metric-header,
+#tableContainer tbody tr.frozen-row-1:hover td.metric-label,
+#tableContainer tbody tr.frozen-row-2:hover td.metric-header,
+#tableContainer tbody tr.frozen-row-2:hover td.metric-label {
+  background-color: #ffedd5 !important;
+  color: #9a3412 !important;
 }
 
 
@@ -188,6 +252,7 @@
 
 /* ── Mobile responsive ───────────────────────────────── */
 @media (max-width: 768px) {
+
   #tableContainer table,
   #tableContainer thead,
   #tableContainer tbody,
@@ -205,7 +270,7 @@
     margin-bottom: 1rem;
     border: 1px solid #d0d0d0;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     overflow: hidden;
   }
 
@@ -233,6 +298,18 @@
     text-transform: uppercase;
     letter-spacing: 0.07em;
     white-space: nowrap;
+  }
+
+  #tableContainer tr.group-header-row td::before {
+    display: none;
+  }
+
+  #tableContainer tr.frozen-row-1 td,
+  #tableContainer tr.frozen-row-2 td {
+    position: static;
+    top: auto;
+    left: auto;
+    box-shadow: none;
   }
 
   #tableContainer td:last-child {
