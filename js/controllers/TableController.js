@@ -19,6 +19,12 @@ class TableController {
     this.productSelect = document.getElementById("productSelect");
     this.filterInput = document.getElementById("filter");
     this.clearFilterBtn = document.getElementById("clearFilter");
+    this.searchPrevBtn = document.getElementById("searchPrevBtn");
+    this.searchNextBtn = document.getElementById("searchNextBtn");
+    this.searchMatchCount = document.getElementById("searchMatchCount");
+    this.searchSoundToggle = document.getElementById("searchSoundToggle");
+    this.soundIconOn = document.getElementById("soundIconOn");
+    this.soundIconOff = document.getElementById("soundIconOff");
     this.compactToggle = document.getElementById("compactToggle");
   }
 
@@ -31,15 +37,48 @@ class TableController {
       this.handleProductChange(),
     );
 
-    // Filter input
+    // Search input (find in table)
     this.filterInput?.addEventListener("input", () =>
-      this.handleFilterChange(),
+      this.handleSearchInput(),
     );
 
-    // Clear filter button
+    // Keyboard navigation (Enter = Next, Shift+Enter = Prev, Esc = Clear)
+    this.filterInput?.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (e.shiftKey) {
+          this.view.prevMatch();
+        } else {
+          this.view.nextMatch();
+        }
+      } else if (e.key === "Escape") {
+        this.handleClearFilter();
+      }
+    });
+
+    // Next / Prev button controls
+    this.searchNextBtn?.addEventListener("click", () => this.view.nextMatch());
+    this.searchPrevBtn?.addEventListener("click", () => this.view.prevMatch());
+
+    // Sound toggle control
+    this.searchSoundToggle?.addEventListener("click", () => {
+      const isEnabled = this.view.toggleSound();
+      if (this.soundIconOn && this.soundIconOff) {
+        this.soundIconOn.classList.toggle("hidden", !isEnabled);
+        this.soundIconOff.classList.toggle("hidden", isEnabled);
+      }
+      if (isEnabled) {
+        this.view.playJumpSound();
+      }
+    });
+
+    // Clear search button
     this.clearFilterBtn?.addEventListener("click", () =>
       this.handleClearFilter(),
     );
+
+    // Match status changes from view
+    this.view.onSearchMatchChange = (status) => this.updateSearchStatus(status);
 
     // Compact mode toggle
     this.compactToggle?.addEventListener("change", (e) =>
@@ -117,23 +156,58 @@ class TableController {
   }
 
   /**
-   * Handle filter change
+   * Handle search input typing
    */
-  handleFilterChange() {
-    this.currentFilter = this.filterInput.value.trim();
-    this.view.resetPage();
-    this.reloadCurrentProduct();
+  handleSearchInput() {
+    const query = this.filterInput?.value || "";
+    this.currentFilter = query.trim();
+    if (this.currentFilter) {
+      this.view.findMatches(this.currentFilter);
+    } else {
+      this.view.clearSearch();
+    }
   }
 
   /**
-   * Handle clear filter
+   * Handle clear search
    */
   handleClearFilter() {
-    this.filterInput.value = "";
+    if (this.filterInput) {
+      this.filterInput.value = "";
+    }
     this.currentFilter = "";
-    this.view.resetSort();
-    this.view.resetPage();
-    this.reloadCurrentProduct();
+    this.view.clearSearch();
+    this.filterInput?.focus();
+  }
+
+  /**
+   * Update search badge counter and Prev/Next button states
+   */
+  updateSearchStatus({ current, total, query }) {
+    if (!this.searchMatchCount) return;
+
+    if (!query) {
+      this.searchMatchCount.classList.add("hidden");
+      this.searchMatchCount.textContent = "0 of 0";
+      if (this.searchPrevBtn) this.searchPrevBtn.disabled = true;
+      if (this.searchNextBtn) this.searchNextBtn.disabled = true;
+      return;
+    }
+
+    this.searchMatchCount.classList.remove("hidden");
+    if (total > 0) {
+      this.searchMatchCount.textContent = `${current} of ${total}`;
+      this.searchMatchCount.className =
+        "text-xs font-bold text-black bg-slate-100 px-2 py-0.5 rounded border border-slate-300";
+      if (this.searchPrevBtn) this.searchPrevBtn.disabled = false;
+      if (this.searchNextBtn) this.searchNextBtn.disabled = false;
+    } else {
+      this.searchMatchCount.textContent = "0 of 0";
+      this.searchMatchCount.className =
+        "text-xs font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200";
+      if (this.searchPrevBtn) this.searchPrevBtn.disabled = true;
+      if (this.searchNextBtn) this.searchNextBtn.disabled = true;
+    }
   }
 
   /**
@@ -191,10 +265,13 @@ class TableController {
   }
 
   /**
-   * Render table with current filter
+   * Render table and apply in-table search
    */
   renderTable(data) {
     const compactMode = this.compactToggle?.checked || false;
-    this.view.render(data, this.currentFilter, compactMode);
+    this.view.render(data, "", compactMode);
+    if (this.currentFilter) {
+      this.view.findMatches(this.currentFilter, false);
+    }
   }
 }

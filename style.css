@@ -2,11 +2,46 @@
 
 /* Navigation */
 .nav-link {
-  @apply px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors flex items-center gap-2 font-medium;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  color: #334155;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.nav-link svg {
+  display: block;
+  flex-shrink: 0;
+  color: #64748b;
+  transition: color 0.15s ease;
+}
+
+.nav-link:hover {
+  background-color: #f1f5f9;
+  color: #000000;
+}
+
+.nav-link:hover svg {
+  color: #000000;
 }
 
 .nav-link.active {
-  @apply bg-blue-100 text-blue-700;
+  background-color: #f8fafc !important;
+  color: #000000 !important;
+  border-color: #e2e8f0 !important;
+  font-weight: 700 !important;
+  box-shadow: inset 0 -2px 0 0 #DF4907 !important;
+}
+
+.nav-link.active svg {
+  color: #DF4907 !important;
 }
 
 /* View pages */
@@ -134,13 +169,13 @@
 }
 
 #tableContainer tbody tr:hover td {
-  background-color: #f1f5f9 !important;
+  background-color: #f1f5f9;
   /* soft slate-100 highlight */
 }
 
 /* ── Group section header rows (Simpson style) ───────── */
 #tableContainer tr.group-header-row td {
-  background-color: #f8fafc !important;
+  background-color: #f8fafc;
   /* clean neutral slate-50 */
   color: #334155 !important;
   /* readable slate-700 text */
@@ -159,7 +194,7 @@
 /* ── First column: metric label (Orange brand anchor) ── */
 #tableContainer td.metric-header,
 #tableContainer td.metric-label {
-  background-color: #fffaf5 !important;
+  background-color: #fffaf5;
   /* subtle warm ivory background */
   color: #0f172a !important;
   text-align: left !important;
@@ -182,13 +217,13 @@
 /* Metric label on alternating (even) rows */
 #tableContainer tbody tr:nth-child(even) td.metric-header,
 #tableContainer tbody tr:nth-child(even) td.metric-label {
-  background-color: #fffaf5 !important;
+  background-color: #fffaf5;
 }
 
 /* Metric label hover — soft warm amber tint */
 #tableContainer tbody tr:hover td.metric-header,
 #tableContainer tbody tr:hover td.metric-label {
-  background-color: #ffedd5 !important;
+  background-color: #ffedd5;
   /* soft orange-100 hover */
   color: #9a3412 !important;
 }
@@ -207,7 +242,7 @@
   left: 0;
   top: 0;
   z-index: 30;
-  background-color: #fffaf5 !important;
+  background-color: #fffaf5;
 }
 
 #tableContainer tr.frozen-row-2 td {
@@ -223,20 +258,20 @@
   left: 0;
   top: var(--frozen-row-1-height, 37px);
   z-index: 30;
-  background-color: #fffaf5 !important;
+  background-color: #fffaf5;
 }
 
 /* Hover state for frozen rows */
 #tableContainer tbody tr.frozen-row-1:hover td,
 #tableContainer tbody tr.frozen-row-2:hover td {
-  background-color: #f1f5f9 !important;
+  background-color: #f1f5f9;
 }
 
 #tableContainer tbody tr.frozen-row-1:hover td.metric-header,
 #tableContainer tbody tr.frozen-row-1:hover td.metric-label,
 #tableContainer tbody tr.frozen-row-2:hover td.metric-header,
 #tableContainer tbody tr.frozen-row-2:hover td.metric-label {
-  background-color: #ffedd5 !important;
+  background-color: #ffedd5;
   color: #9a3412 !important;
 }
 
@@ -314,5 +349,131 @@
 
   #tableContainer td:last-child {
     border-bottom: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
+   IN-TABLE SEARCH HIGHLIGHTS (#e9f5db Tea Green / Pale Sage Theme)
+   Borderless, high-contrast, with 3-second flashing effect
+   ═══════════════════════════════════════════════════════ */
+
+/* Active focused matching row (steady state: clean #e9f5db pale sage, BORDERLESS) */
+#tableContainer tbody tr.search-match-active td {
+  background-color: #e9f5db; /* Requested pale sage / tea green */
+  color: #1a2e05;
+  border-top: none !important;
+  border-bottom: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#tableContainer tbody tr.search-match-active td.metric-label,
+#tableContainer tbody tr.search-match-active td.metric-header {
+  background-color: #e9f5db;
+  color: #1a2e05;
+  font-weight: 700;
+  border-left: none !important; /* Borderless highlight */
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+/* Active matching cell (focused cell hit: richer accent of #e9f5db, BORDERLESS) */
+#tableContainer tbody tr.search-match-active td.search-match-cell {
+  background-color: #cfe1b9; /* Harmonious rich sage tone */
+  color: #1a2e05;
+  font-weight: 800;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Hover state on active row */
+#tableContainer tbody tr.search-match-active:hover td {
+  background-color: #dcebc8;
+}
+
+#tableContainer tbody tr.search-match-active:hover td.search-match-cell {
+  background-color: #b5c99a;
+  color: #1a2e05;
+}
+
+/* ── 3-Second Flashing Effect on Navigation Jump (#e9f5db Pulses) ── */
+#tableContainer tbody tr.search-match-flash td {
+  animation: rowGreenPastelFlash 3s ease-in-out forwards;
+  border-top: none !important;
+  border-bottom: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#tableContainer tbody tr.search-match-flash td.metric-label,
+#tableContainer tbody tr.search-match-flash td.metric-header {
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+@keyframes rowGreenPastelFlash {
+  0% {
+    background-color: #b5c99a; /* Immediate visible sage pulse */
+  }
+  20% {
+    background-color: #e9f5db; /* Valley */
+  }
+  40% {
+    background-color: #97a97c; /* Pulse 2: rich energetic sage accent */
+  }
+  60% {
+    background-color: #e9f5db; /* Valley */
+  }
+  80% {
+    background-color: #cfe1b9; /* Pulse 3: soft warm glow */
+  }
+  92% {
+    background-color: #e9f5db; /* Valley */
+  }
+  100% {
+    background-color: #e9f5db; /* Clean settle into #e9f5db */
+    color: #1a2e05;
+  }
+}
+
+#tableContainer tbody tr.search-match-flash td.search-match-cell-flash {
+  animation: cellGreenPastelFlash 3s ease-in-out forwards;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+@keyframes cellGreenPastelFlash {
+  0% {
+    background-color: #718256; /* Immediate deep sage burst */
+    color: #ffffff;
+  }
+  20% {
+    background-color: #cfe1b9;
+    color: #1a2e05;
+  }
+  40% {
+    background-color: #586942; /* Pulse 2 */
+    color: #ffffff;
+  }
+  60% {
+    background-color: #cfe1b9;
+    color: #1a2e05;
+  }
+  80% {
+    background-color: #b5c99a;
+    color: #1a2e05;
+  }
+  92% {
+    background-color: #cfe1b9;
+    color: #1a2e05;
+  }
+  100% {
+    background-color: #cfe1b9; /* Settle into active cell accent */
+    color: #1a2e05;
   }
 }
