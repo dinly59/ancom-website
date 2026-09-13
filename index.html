@@ -9,49 +9,48 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
 
+  <link rel="icon" type="image/png" href="assets/simpson-strong-tie-logo.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
   <!-- Internal Use Warning Banner -->
-  <div class="bg-blue-50/80 border-b border-blue-100 py-1.5 px-4 text-center backdrop-blur-sm relative z-50">
-    <p class="text-blue-700 text-xs font-medium flex items-center justify-center gap-1.5">
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <div class="bg-slate-50 border-b border-slate-200 py-1.5 px-4 text-center relative z-50">
+    <p class="text-slate-600 text-xs font-medium flex items-center justify-center gap-1.5">
+      <svg class="w-3.5 h-3.5 text-[#DF4907]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
       </svg>
-      Internal Simpson Strong-Tie tool &mdash; Please do not share outside the company
+      <span class="font-bold text-black">Internal Simpson Strong-Tie tool</span> &mdash; Please do not share outside the company
     </p>
   </div>
 
   <!-- Navigation -->
-  <nav class="bg-white shadow-md sticky top-0 z-40">
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
     <div class="container mx-auto px-4 max-w-7xl">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center gap-3">
-          <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span class="text-xl font-bold text-slate-800">Anchor Product Viewer</span>
+          <img src="assets/simpson-strong-tie-logo.png" alt="Simpson Strong-Tie"
+            class="h-9 w-auto object-contain rounded-xs shadow-xs" />
+          <span class="text-xl font-extrabold text-black tracking-tight">Anchor Product Viewer</span>
         </div>
-        <div class="flex gap-1">
+        <div class="flex items-center gap-1">
           <a href="#home" class="nav-link" data-page="home">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
             Home
           </a>
           <a href="#table" class="nav-link" data-page="table">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
             Table
           </a>
           <a href="#compare" class="nav-link" data-page="compare">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
@@ -194,17 +193,43 @@
             <select id="productSelect" aria-label="Product select"
               class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700"></select>
           </div>
-          <div class="flex-1 min-w-[200px]">
-            <label for="filter" class="block text-sm font-semibold text-slate-700 mb-2">Search</label>
-            <div class="relative">
-              <input id="filter" placeholder='Search: e.g. 1/2" or "cracked"'
-                class="w-full px-4 py-2.5 pr-10 bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700" />
-              <button id="clearFilter" title="Clear search"
-                class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+          <div class="flex-1 min-w-[320px]">
+            <label for="filter" class="block text-sm font-semibold text-slate-700 mb-2">Search in Table</label>
+            <div class="relative flex items-center">
+              <input id="filter" placeholder='Find metrics or values (e.g. "breakout", "900", "crack")...'
+                class="w-full px-4 py-2.5 pr-36 bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DF4907] focus:border-[#DF4907] text-slate-900 text-sm" />
+              <div class="absolute right-2.5 flex items-center gap-1">
+                <span id="searchMatchCount" class="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded hidden">
+                  0 of 0
+                </span>
+                <button id="searchPrevBtn" type="button" title="Previous match (Shift+Enter)" aria-label="Previous match" disabled
+                  class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                  </svg>
+                </button>
+                <button id="searchNextBtn" type="button" title="Next match (Enter)" aria-label="Next match" disabled
+                  class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <button id="searchSoundToggle" type="button" title="Jump sound effect (Click to mute/unmute)" aria-label="Toggle jump sound"
+                  class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors">
+                  <svg id="soundIconOn" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                  </svg>
+                  <svg id="soundIconOff" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l4-4m0 4l-4-4" />
+                  </svg>
+                </button>
+                <button id="clearFilter" type="button" title="Clear search (Esc)" aria-label="Clear search"
+                  class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
           <div class="flex items-center gap-4 ml-auto">

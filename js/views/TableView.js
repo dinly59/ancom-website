@@ -10,6 +10,13 @@ class TableView {
     this.currentPage = 1;
     this.PAGE_SIZE = 10;
     this.rowMetrics = []; // will be set dynamically
+    this.matches = [];
+    this.currentMatchIndex = -1;
+    this.searchTerm = "";
+    this.onSearchMatchChange = null;
+    this.flashTimeout = null;
+    this.soundEnabled = true;
+    this.audioCtx = null;
   }
 
   /**
@@ -331,6 +338,11 @@ class TableView {
     if (columns.length > this.PAGE_SIZE) {
       this.renderPagination(totalPages);
     }
+
+    // Re-apply in-table search if active
+    if (this.searchTerm) {
+      this.findMatches(this.searchTerm, false);
+    }
   }
 
   /**
@@ -583,5 +595,225 @@ class TableView {
 
   onNextPage() {
     // Placeholder - will be set by controller
+  }
+
+  /**
+   * Search across both row header and value cells in all rows
+   */
+  findMatches(searchTerm, resetIndex = true) {
+    this.searchTerm = (searchTerm || "").trim().toLowerCase();
+    this.matches = [];
+    this.clearSearchHighlights();
+
+    if (!this.searchTerm) {
+      this.currentMatchIndex = -1;
+      if (this.onSearchMatchChange) {
+        this.onSearchMatchChange({ current: 0, total: 0, query: "" });
+      }
+      return;
+    }
+
+    const rows = this.container.querySelectorAll("tbody tr:not(.group-header-row)");
+    rows.forEach((row) => {
+      const cells = Array.from(row.querySelectorAll("td"));
+      const matchingCells = [];
+
+      cells.forEach((cell) => {
+        const text = (cell.textContent || "").toLowerCase();
+        if (text.includes(this.searchTerm)) {
+          matchingCells.push(cell);
+        }
+      });
+
+      if (matchingCells.length > 0) {
+        row.classList.add("search-match-row");
+        this.matches.push({ row, matchingCells });
+      }
+    });
+
+    if (this.matches.length > 0) {
+      const targetIndex = resetIndex
+        ? 0
+        : Math.min(Math.max(0, this.currentMatchIndex), this.matches.length - 1);
+      this.goToMatch(targetIndex);
+    } else {
+      this.currentMatchIndex = -1;
+      if (this.onSearchMatchChange) {
+        this.onSearchMatchChange({ current: 0, total: 0, query: this.searchTerm });
+      }
+    }
+  }
+
+  /**
+   * Cycle to a specific match index and scroll into view smoothly
+   */
+  goToMatch(index) {
+    if (this.matches.length === 0) return;
+
+    // Remove active highlight from previous match
+    if (this.currentMatchIndex >= 0 && this.matches[this.currentMatchIndex]) {
+      const prev = this.matches[this.currentMatchIndex];
+      prev.row.classList.remove("search-match-active", "search-match-flash");
+      prev.matchingCells.forEach((c) =>
+        c.classList.remove("search-match-cell", "search-match-cell-flash"),
+      );
+    }
+
+    // Wrap around index for cycling
+    this.currentMatchIndex = (index + this.matches.length) % this.matches.length;
+    const current = this.matches[this.currentMatchIndex];
+
+    // Add persistent active highlight to row and matching cells
+    current.row.classList.add("search-match-active");
+    current.matchingCells.forEach((c) => c.classList.add("search-match-cell"));
+
+    // Add temporary pulse highlight class (reflow ensures animation restarts on each navigation)
+    current.row.classList.remove("search-match-flash");
+    void current.row.offsetWidth;
+    current.row.classList.add("search-match-flash");
+
+    current.matchingCells.forEach((c) => {
+      c.classList.remove("search-match-cell-flash");
+      void c.offsetWidth;
+      c.classList.add("search-match-cell-flash");
+    });
+
+    if (this.flashTimeout) clearTimeout(this.flashTimeout);
+    this.flashTimeout = setTimeout(() => {
+      current.row.classList.remove("search-match-flash");
+      current.matchingCells.forEach((c) =>
+        c.classList.remove("search-match-cell-flash"),
+      );
+    }, 3000);
+
+    // Play subtle chime sound feedback on jump
+    this.playJumpSound();
+
+    // Scroll smoothly into view
+    current.row.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // If there is a matching data cell that might be horizontally scrolled out, ensure horizontal visibility
+    const valueCell = current.matchingCells.find(
+      (c) => !c.classList.contains("metric-label"),
+    );
+    if (valueCell) {
+      valueCell.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    }
+
+    if (this.onSearchMatchChange) {
+      this.onSearchMatchChange({
+        current: this.currentMatchIndex + 1,
+        total: this.matches.length,
+        query: this.searchTerm,
+      });
+    }
+  }
+
+  /**
+   * Go to next match
+   */
+  nextMatch() {
+    if (this.matches.length === 0) return;
+    this.goToMatch(this.currentMatchIndex + 1);
+  }
+
+  /**
+   * Go to previous match
+   */
+  prevMatch() {
+    if (this.matches.length === 0) return;
+    this.goToMatch(this.currentMatchIndex - 1);
+  }
+
+  /**
+   * Remove all search highlight classes
+   */
+  clearSearchHighlights() {
+    if (this.flashTimeout) {
+      clearTimeout(this.flashTimeout);
+      this.flashTimeout = null;
+    }
+
+    const activeRows = this.container.querySelectorAll(
+      ".search-match-row, .search-match-active, .search-match-flash",
+    );
+    activeRows.forEach((r) =>
+      r.classList.remove(
+        "search-match-row",
+        "search-match-active",
+        "search-match-flash",
+      ),
+    );
+
+    const activeCells = this.container.querySelectorAll(
+      ".search-match-cell, .search-match-cell-flash",
+    );
+    activeCells.forEach((c) =>
+      c.classList.remove("search-match-cell", "search-match-cell-flash"),
+    );
+  }
+
+  /**
+   * Reset search state and highlights
+   */
+  clearSearch() {
+    this.searchTerm = "";
+    this.matches = [];
+    this.currentMatchIndex = -1;
+    this.clearSearchHighlights();
+    if (this.onSearchMatchChange) {
+      this.onSearchMatchChange({ current: 0, total: 0, query: "" });
+    }
+  }
+
+  /**
+   * Play subtle, clean chime audio feedback when jumping to a search match
+   */
+  playJumpSound() {
+    if (!this.soundEnabled) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!this.audioCtx) {
+        this.audioCtx = new AudioCtx();
+      }
+      if (this.audioCtx.state === "suspended") {
+        this.audioCtx.resume();
+      }
+
+      const now = this.audioCtx.currentTime;
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+
+      // Soft water-drop / chime sine wave (520Hz -> 780Hz)
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+
+      // Gentle non-intrusive exponential volume envelope
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.08, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.13);
+    } catch (e) {
+      // Audio playback silently ignored if browser denies audio
+    }
+  }
+
+  /**
+   * Toggle search audio feedback on/off
+   */
+  toggleSound() {
+    this.soundEnabled = !this.soundEnabled;
+    return this.soundEnabled;
   }
 }
