@@ -111,6 +111,20 @@ class TableView {
   }
 
   /**
+   * Show empty placeholder when no product is selected
+   */
+  showEmptyState(message = "Please select a product to view specifications.") {
+    this.container.innerHTML = `
+      <div class="text-center py-16 text-slate-500 bg-white rounded-xl shadow-sm border border-slate-200">
+        <svg class="inline-block w-16 h-16 mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <p class="text-lg font-medium text-slate-600">${message}</p>
+      </div>
+    `;
+  }
+
+  /**
    * Render the product data table (transposed view)
    */
   render(data, filter = "", compactMode = false) {

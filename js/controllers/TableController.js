@@ -16,6 +16,7 @@ class TableController {
    * Initialize DOM elements
    */
   initElements() {
+    this.companySelect = document.getElementById("companySelect");
     this.productSelect = document.getElementById("productSelect");
     this.filterInput = document.getElementById("filter");
     this.clearFilterBtn = document.getElementById("clearFilter");
@@ -32,6 +33,11 @@ class TableController {
    * Bind event listeners
    */
   bindEvents() {
+    // Company filter selection
+    this.companySelect?.addEventListener("change", () =>
+      this.handleCompanyChange(),
+    );
+
     // Product selection
     this.productSelect?.addEventListener("change", () =>
       this.handleProductChange(),
@@ -96,17 +102,53 @@ class TableController {
    */
   async initialize() {
     const products = this.model.getProducts();
-    this.populateProductSelect(products);
+    this.populateCompanySelect(products);
+    this.updateProductSelect();
   }
 
   /**
-   * Populate product dropdown
+   * Populate company filter dropdown
    */
-  populateProductSelect(products) {
+  populateCompanySelect(products) {
+    if (!this.companySelect) return;
+
+    const companies = [
+      ...new Set(
+        products
+          .map((p) => p.company?.value || p.company)
+          .filter(Boolean),
+      ),
+    ].sort();
+
+    this.companySelect.innerHTML = '<option value="">All Companies</option>';
+
+    companies.forEach((company) => {
+      const opt = document.createElement("option");
+      opt.value = company;
+      opt.textContent = company;
+      this.companySelect.appendChild(opt);
+    });
+  }
+
+  /**
+   * Update product dropdown based on selected company
+   */
+  updateProductSelect() {
     if (!this.productSelect) return;
 
+    const allProducts = this.model.getProducts();
+    let products = allProducts;
+    const selectedCompany = this.companySelect?.value;
+    if (selectedCompany) {
+      products = products.filter(
+        (p) => (p.company?.value || p.company) === selectedCompany,
+      );
+    }
+
+    const currentValue = this.productSelect.value;
     this.productSelect.innerHTML =
       '<option value="">Select a product...</option>';
+
     products.forEach((p) => {
       const opt = document.createElement("option");
       const filename = typeof p === "string" ? p : (p.filename || p.name);
@@ -120,18 +162,72 @@ class TableController {
       opt.textContent = label;
       this.productSelect.appendChild(opt);
     });
+
+    if (
+      currentValue &&
+      products.some((p) => (p.filename || p.name) === currentValue)
+    ) {
+      this.productSelect.value = currentValue;
+    } else {
+      this.productSelect.value = "";
+    }
+  }
+
+  /**
+   * Handle company filter change
+   */
+  async handleCompanyChange() {
+    this.updateProductSelect();
+
+    // Option 1: If current product is not in the newly selected company,
+    // auto-select the first product of this company and load its table immediately.
+    if (!this.productSelect.value) {
+      const allProducts = this.model.getProducts();
+      const selectedCompany = this.companySelect?.value;
+      const products = selectedCompany
+        ? allProducts.filter(
+            (p) => (p.company?.value || p.company) === selectedCompany,
+          )
+        : allProducts;
+
+      if (products.length > 0) {
+        const first = products[0];
+        this.productSelect.value =
+          typeof first === "string" ? first : (first.filename || first.name);
+        await this.handleProductChange();
+      } else {
+        this.currentProduct = null;
+        this.view.showEmptyState("No products available for this company.");
+      }
+    }
   }
 
   /**
    * Load and render first product
    */
   async loadFirstProduct() {
-    const products = this.model.getProducts();
-    if (products.length > 0 && !this.currentProduct) {
+    if (this.currentProduct) return;
+
+    if (this.productSelect?.value) {
+      await this.handleProductChange();
+      return;
+    }
+
+    const allProducts = this.model.getProducts();
+    const selectedCompany = this.companySelect?.value;
+    const products = selectedCompany
+      ? allProducts.filter(
+          (p) => (p.company?.value || p.company) === selectedCompany,
+        )
+      : allProducts;
+
+    if (products.length > 0) {
       const first = products[0];
       const filename =
-        typeof first === "string" ? first : first.filename || first.name;
-      this.productSelect.value = filename;
+        typeof first === "string" ? first : (first.filename || first.name);
+      if (this.productSelect) {
+        this.productSelect.value = filename;
+      }
       await this.handleProductChange();
     }
   }
@@ -140,8 +236,12 @@ class TableController {
    * Handle product selection change
    */
   async handleProductChange() {
-    const filename = this.productSelect.value;
-    if (!filename) return;
+    const filename = this.productSelect?.value;
+    if (!filename) {
+      this.currentProduct = null;
+      this.view.showEmptyState();
+      return;
+    }
 
     this.view.showLoading();
     try {
