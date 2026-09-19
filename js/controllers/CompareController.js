@@ -285,13 +285,13 @@ class CompareController {
     const selectedCompany = companySelect?.value;
     if (selectedCompany) {
       products = products.filter(
-        (p) => (p.company?.value || p.company) === selectedCompany,
+        (p) => (p.company?.value) === selectedCompany,
       );
     }
 
     const currentValue = productSelect.value;
     productSelect.innerHTML = '<option value="">Select a product...</option>';
-    
+
     products.forEach((p) => {
       const opt = document.createElement("option");
       const filename = p.filename || p.name;
