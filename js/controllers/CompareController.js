@@ -163,9 +163,44 @@ class CompareController {
     });
 
     return {
-      tension: { flatCategories, groups, series: tensionSeries },
-      shear: { flatCategories, groups, series: shearSeries },
+      tension: { flatCategories, groups, series: this.layerSeriesByHeight(tensionSeries) },
+      shear: { flatCategories, groups, series: this.layerSeriesByHeight(shearSeries) },
     };
+  }
+
+  /**
+   * Re-order exactly-2-product series into background/foreground render layers so the
+   * shorter bar at each x-position always draws on top instead of being hidden by the taller one.
+   * Legend-only proxy series preserve the original product names/colors in the legend.
+   * @param {Array} originalSeries - [{ name, data, color }, { name, data, color }]
+   */
+  layerSeriesByHeight(originalSeries) {
+    const [a, b] = originalSeries;
+    if (!a || !b) return originalSeries;
+
+    const background = [];
+    const foreground = [];
+    for (let i = 0; i < a.data.length; i++) {
+      const va = a.data[i];
+      const vb = b.data[i];
+      if (va == null && vb == null) {
+        background.push(null);
+        foreground.push(null);
+      } else if (vb == null || (va != null && va >= vb)) {
+        background.push({ y: va, color: a.color, origName: a.name });
+        foreground.push(vb == null ? null : { y: vb, color: b.color, origName: b.name });
+      } else {
+        background.push({ y: vb, color: b.color, origName: b.name });
+        foreground.push({ y: va, color: a.color, origName: a.name });
+      }
+    }
+
+    return [
+      { name: a.name, color: a.color, data: [], showInLegend: true, enableMouseTracking: false, zIndex: 0 },
+      { name: b.name, color: b.color, data: [], showInLegend: true, enableMouseTracking: false, zIndex: 0 },
+      { id: "__background", name: "__background", data: background, showInLegend: false, zIndex: 1 },
+      { id: "__foreground", name: "__foreground", data: foreground, showInLegend: false, zIndex: 2 },
+    ];
   }
 
   constructor(model, view) {
