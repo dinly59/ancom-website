@@ -140,6 +140,7 @@ class CompareController {
         name: product.name?.value || product.name || `Product ${idx + 1}`,
         data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
         color: this.view.colors[idx % this.view.colors.length],
+        productId: idx,
       };
     });
 
@@ -159,6 +160,7 @@ class CompareController {
         name: product.name?.value || product.name || `Product ${idx + 1}`,
         data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
         color: this.view.colors[idx % this.view.colors.length],
+        productId: idx,
       };
     });
 
@@ -172,7 +174,9 @@ class CompareController {
    * Re-order exactly-2-product series into background/foreground render layers so the
    * shorter bar at each x-position always draws on top instead of being hidden by the taller one.
    * Legend-only proxy series preserve the original product names/colors in the legend.
-   * @param {Array} originalSeries - [{ name, data, color }, { name, data, color }]
+   * Points carry identity under `custom` (Highcharts' reserved namespace for arbitrary point
+   * data) so hover/selection reliably reads the actual product, not the height role/layer.
+   * @param {Array} originalSeries - [{ name, data, color, productId }, { name, data, color, productId }]
    */
   layerSeriesByHeight(originalSeries) {
     const [a, b] = originalSeries;
@@ -187,21 +191,26 @@ class CompareController {
         background.push(null);
         foreground.push(null);
       } else if (vb == null || (va != null && va >= vb)) {
-        background.push({ y: va, color: a.color, origName: a.name });
-        foreground.push(vb == null ? null : { y: vb, color: b.color, origName: b.name });
+        background.push({ y: va, color: a.color, custom: { origName: a.name, productId: a.productId } });
+        foreground.push(
+          vb == null
+            ? null
+            : { y: vb, color: b.color, custom: { origName: b.name, productId: b.productId } },
+        );
       } else {
-        background.push({ y: vb, color: b.color, origName: b.name });
-        foreground.push({ y: va, color: a.color, origName: a.name });
+        background.push({ y: vb, color: b.color, custom: { origName: b.name, productId: b.productId } });
+        foreground.push({ y: va, color: a.color, custom: { origName: a.name, productId: a.productId } });
       }
     }
 
     return [
-      { name: a.name, color: a.color, data: [], showInLegend: true, enableMouseTracking: false, zIndex: 0 },
-      { name: b.name, color: b.color, data: [], showInLegend: true, enableMouseTracking: false, zIndex: 0 },
+      { name: a.name, color: a.color, productId: a.productId, data: [], showInLegend: true, enableMouseTracking: false, zIndex: 0 },
+      { name: b.name, color: b.color, productId: b.productId, data: [], showInLegend: true, enableMouseTracking: false, zIndex: 0 },
       { id: "__background", name: "__background", data: background, showInLegend: false, zIndex: 1 },
       { id: "__foreground", name: "__foreground", data: foreground, showInLegend: false, zIndex: 2 },
     ];
   }
+
 
   constructor(model, view) {
     this.model = model;
