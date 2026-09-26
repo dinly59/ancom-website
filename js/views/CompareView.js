@@ -296,17 +296,17 @@ class CompareView {
           point.graphic.attr(
             isDimmed
               ? {
-                  fill: "none",
-                  stroke: point.color,
-                  
-            
-                }
+                fill: "none",
+                stroke: point.color,
+
+
+              }
               : {
-                  fill: point.color,
-                  stroke: "none",
-                  "stroke-width": 0,
-                  "stroke-dasharray": "none",
-                },
+                fill: point.color,
+                stroke: "none",
+                "stroke-width": 0,
+                "stroke-dasharray": "none",
+              },
           );
           point.graphic.attr({ opacity: isFaded ? 0.25 : 1 });
         });
@@ -341,6 +341,31 @@ class CompareView {
       };
     });
 
+    const renderRowLabels = (chart) => {
+      if (chart.__hefRowLabel) {
+        chart.__hefRowLabel.destroy();
+        chart.__hefRowLabel = null;
+      }
+
+      if (!flatCategories || flatCategories.length === 0) return;
+
+      const yBottom = chart.plotTop + chart.plotHeight;
+      const labelX = chart.plotLeft + chart.plotWidth + 10;
+
+      chart.__hefRowLabel = chart.renderer
+        .text('h<sub>ef</sub> (in.)', labelX, yBottom + 20)
+        .attr({
+          align: "left",
+          zIndex: 5,
+        })
+        .css({
+          fontSize: "11px",
+          fontWeight: "600",
+          color: "#64748b",
+        })
+        .add();
+    };
+
     Highcharts.chart(containerId, {
       chart: {
         type: "column",
@@ -348,9 +373,12 @@ class CompareView {
         backgroundColor: "transparent",
         style: { fontFamily: "inherit" },
         marginBottom: 100,
+        marginLeft: 60,
+        marginRight: 60,
         events: {
           render: function () {
             applyProductHighlight(this);
+            renderRowLabels(this);
           },
         },
       },
@@ -361,8 +389,8 @@ class CompareView {
         categories: flatCategories,
         plotBands,
         plotLines,
-        
-        labels: { 
+
+        labels: {
           style: { fontSize: "11px", color: "#64748b" },
           y: 20
         },
@@ -370,7 +398,7 @@ class CompareView {
         lineColor: "#cbd5e1"
       },
       yAxis: {
-        title: { 
+        title: {
           text: yTitle,
           style: { color: "#475569", fontWeight: "600", fontSize: "13px" },
           margin: 20
