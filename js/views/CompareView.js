@@ -280,14 +280,19 @@ class CompareView {
     // Product legend items (id-less proxy series) toggle an isolate/ghost view:
     // clicking a product highlights its bars solid and turns the other product's
     // bars into a dashed outline; clicking the same item again restores both.
+    // Hovering a bar fades out bars belonging to the other product/color so a
+    // single product's bars can be tracked across the whole chart.
     const applyProductHighlight = (chart) => {
       const selected = chart.__selectedProduct;
+      const hovered = chart.__hoveredProduct;
       ["__background", "__foreground"].forEach((id) => {
         const layer = chart.get(id);
         if (!layer) return;
         layer.points.forEach((point) => {
           if (!point.graphic || point.y == null) return;
-          const isDimmed = selected && point.origName !== selected;
+          const origName = point.custom?.origName;
+          const isDimmed = selected && origName !== selected;
+          const isFaded = hovered && origName !== hovered;
           point.graphic.attr(
             isDimmed
               ? {
@@ -303,6 +308,7 @@ class CompareView {
                   "stroke-dasharray": "none",
                 },
           );
+          point.graphic.attr({ opacity: isFaded ? 0.25 : 1 });
         });
       });
     };
@@ -355,6 +361,7 @@ class CompareView {
         categories: flatCategories,
         plotBands,
         plotLines,
+        
         labels: { 
           style: { fontSize: "11px", color: "#64748b" },
           y: 20
@@ -385,6 +392,25 @@ class CompareView {
           maxPointWidth: 40,
           borderRadius: 4,
           borderWidth: 0,
+          // Disable Highcharts' built-in per-series dimming of the "other" layer on
+          // hover; our own origName/color-based fade in applyProductHighlight replaces it.
+          states: { hover: { enabled: false }, inactive: { opacity: 1 } },
+          point: {
+            events: {
+              mouseOver: function () {
+                const origName = this.custom?.origName;
+                if (origName == null) return;
+                const chart = this.series.chart;
+                chart.__hoveredProduct = origName;
+                applyProductHighlight(chart);
+              },
+              mouseOut: function () {
+                const chart = this.series.chart;
+                chart.__hoveredProduct = null;
+                applyProductHighlight(chart);
+              },
+            },
+          },
         },
       },
       tooltip: {
@@ -405,7 +431,7 @@ class CompareView {
           const grp = groups.find(
             (g) => ptIdx >= g.startIndex && ptIdx <= g.endIndex,
           );
-          const productName = this.point.origName || this.series.name;
+          const productName = this.point.custom?.origName || this.series.name;
           return (
             `<div style="font-family: inherit; color: #334155;">` +
             `<div style="font-size:13px; font-weight:700; color: #0f172a; margin-bottom: 6px;">${productName}</div>` +
