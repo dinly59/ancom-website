@@ -217,7 +217,7 @@ class CompareView {
 
     const chartDiv = document.createElement("div");
     chartDiv.id = id;
-    chartDiv.style.height = "420px";
+    chartDiv.style.height = "450px";
     div.appendChild(chartDiv);
 
     return div;
@@ -373,7 +373,7 @@ class CompareView {
         backgroundColor: "transparent",
         style: { fontFamily: "inherit" },
         marginBottom: 100,
-        marginLeft: 60,
+
         marginRight: 60,
         events: {
           render: function () {
@@ -400,15 +400,15 @@ class CompareView {
       yAxis: {
         title: {
           text: yTitle,
-          style: { color: "#475569", fontWeight: "600", fontSize: "13px" },
-          margin: 20
+          style: { color: "#475569", fontWeight: "600", fontSize: "14px" },
+          margin: 24
         },
         min: 0,
         gridLineColor: "#e2e8f0",
         labels: {
           style: { color: "#64748b" },
           formatter: function () {
-            return this.value.toLocaleString();
+            return Highcharts.numberFormat(this.value, 0, ".", ",");
           },
         },
       },
@@ -464,7 +464,7 @@ class CompareView {
             `<div style="font-family: inherit; color: #334155;">` +
             `<div style="font-size:13px; font-weight:700; color: #0f172a; margin-bottom: 6px;">${productName}</div>` +
             `<div style="font-size:12px; margin-bottom: 4px;">Diameter: <span style="font-weight:600;">Ø ${grp ? grp.size : ""}</span> &mdash; h<sub style="font-size:9px">ef</sub>: <span style="font-weight:600;">${this.point.category} in.</span></div>` +
-            `<div style="font-size:12px;">Strength: <span style="font-weight:700; color: #DF4907;">${(this.y || 0).toLocaleString()} lbs</span></div>` +
+            `<div style="font-size:12px;">Strength: <span style="font-weight:700; color: #DF4907;">${Highcharts.numberFormat(this.y || 0, 0, ".", ",")} lbs</span></div>` +
             `</div>`
           );
         },
