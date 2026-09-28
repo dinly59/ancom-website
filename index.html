@@ -21,40 +21,41 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
       </svg>
-      <span class="font-bold text-black">Internal Simpson Strong-Tie tool</span> &mdash; Please do not share outside the company
+      <span class="font-bold text-black">Internal Simpson Strong-Tie tool</span> &mdash; Please do not share outside the
+      company
     </p>
   </div>
 
   <!-- Navigation -->
-  <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+  <nav class="bg-white border-b border-slate-200 sticky top-0 z-40">
     <div class="container mx-auto px-4 max-w-7xl">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center gap-3">
           <img src="assets/simpson-strong-tie-logo.png" alt="Simpson Strong-Tie"
-            class="h-9 w-auto object-contain rounded-xs shadow-xs" />
-          <span class="text-xl font-extrabold text-black tracking-tight">Anchor Product Viewer</span>
+            class="h-8 w-auto object-contain" />
+          <span class="text-lg font-bold text-slate-900 tracking-tight">Anchor Product Viewer</span>
         </div>
-        <div class="flex items-center gap-1">
+        <div class="flex items-center gap-1 sm:gap-2">
           <a href="#home" class="nav-link" data-page="home">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            Home
+            <span>Home</span>
           </a>
           <a href="#table" class="nav-link" data-page="table">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
-            Table
+            <span>Table</span>
           </a>
           <a href="#compare" class="nav-link" data-page="compare">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            Compare
+            <span>Compare</span>
           </a>
         </div>
       </div>
@@ -63,59 +64,76 @@
 
   <div class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Home View -->
-    <main id="homeView" class="view-page">
-      <div class="text-center mb-12">
-        <h1 class="text-5xl font-bold text-slate-800 mb-4">
-          Anchor Product Analysis Platform
+    <main id="homeView" class="view-page relative">
+      <!-- Subtle Industrial Blueprint / Dot Grid Background -->
+      <div class="absolute inset-x-0 -top-8 h-[520px] pointer-events-none -z-10 hero-blueprint-bg"></div>
+
+      <!-- Hero Header -->
+      <div class="text-center pt-2 pb-6 mb-10 max-w-3xl mx-auto">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          Anchor Product <span class="text-[#DF4907]">Analysis Platform</span>
         </h1>
-        <p class="text-xl text-slate-600 max-w-3xl mx-auto">
-          Explore and compare anchor specifications from multiple
-          manufacturers with powerful data visualization and comparison tools
-        </p>
       </div>
 
+      <!-- Action Cards -->
       <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
-        <div class="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
+        <!-- Card 1: Data Table View (Secondary Action) -->
+        <div
+          class="home-action-card bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between group relative">
+          <div class="relative z-10">
+            <!-- White Icon Container with crisp dark slate icon -->
+            <div
+              class="card-icon-box w-14 h-14 bg-white border border-slate-200 rounded-xl flex items-center justify-center mb-6 shadow-xs">
+              <svg class="card-icon-svg w-7 h-7 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-black transition-colors">
+              Data Table View
+            </h2>
+            <p class="text-slate-600 mb-8 text-[15px] leading-relaxed">
+              Browse detailed specifications in an interactive table with
+              sorting, searching, and pagination
+            </p>
           </div>
-          <h2 class="text-2xl font-bold text-slate-800 mb-3">
-            Data Table View
-          </h2>
-          <p class="text-slate-600 mb-6">
-            Browse detailed specifications in an interactive table with
-            sorting, searching, and pagination
-          </p>
+          <!-- Secondary Button: Dark Slate Border -->
           <a href="#table"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors">
-            View Data Table
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="relative z-10 inline-flex items-center gap-2.5 px-6 py-3 border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white rounded-xl font-semibold transition-all duration-200 shadow-xs self-start group/btn">
+            <span>View Data Table</span>
+            <svg class="card-btn-arrow w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </a>
         </div>
 
-        <div class="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-            <svg class="w-10 h-10 text-[#DF4907]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+        <!-- Card 2: Product Compare -->
+        <div
+          class="home-action-card bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between group relative">
+          <div class="relative z-10">
+            <!-- White Icon Container with crisp dark slate icon -->
+            <div
+              class="card-icon-box w-14 h-14 bg-white border border-slate-200 rounded-xl flex items-center justify-center mb-6 shadow-xs">
+              <svg class="card-icon-svg w-7 h-7 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-3 tracking-tight group-hover:text-black transition-colors">
+              Product Compare
+            </h2>
+            <p class="text-slate-600 mb-8 text-[15px] leading-relaxed">
+              Side-by-side comparison of multiple products to identify the best
+              solution for your needs
+            </p>
           </div>
-          <h2 class="text-2xl font-bold text-slate-800 mb-3">
-            Product Compare
-          </h2>
-          <p class="text-slate-600 mb-6">
-            Side-by-side comparison of multiple products to identify the best
-            solution for your needs
-          </p>
+          <!-- Button: Dark Slate Border -->
           <a href="#compare"
-            class="inline-flex items-center gap-2 px-6 py-3 bg-[#DF4907] hover:bg-[#c23f06] text-white rounded-lg font-semibold transition-colors">
-            Compare Products
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            class="relative z-10 inline-flex items-center gap-2.5 px-6 py-3 border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white rounded-xl font-semibold transition-all duration-200 shadow-xs self-start group/btn">
+            <span>Compare Products</span>
+            <svg class="card-btn-arrow w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </a>
@@ -126,12 +144,14 @@
         <h3 class="text-xl font-bold text-slate-800 mb-4">Features</h3>
         <div class="grid md:grid-cols-3 gap-6">
           <div class="flex items-start gap-3">
-            <svg class="w-6 h-6 text-green-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
+            <div
+              class="w-7 h-7 rounded-lg bg-orange-100 border border-orange-200/80 shadow-xs flex items-center justify-center flex-shrink-0 text-black mt-0.5">
+              <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
             <div>
-              <h4 class="font-semibold text-slate-800 mb-1">
+              <h4 class="font-semibold text-slate-900 mb-1">
                 Real-time Search
               </h4>
               <p class="text-sm text-slate-600">
@@ -140,12 +160,14 @@
             </div>
           </div>
           <div class="flex items-start gap-3">
-            <svg class="w-6 h-6 text-green-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
+            <div
+              class="w-7 h-7 rounded-lg bg-orange-100 border border-orange-200/80 shadow-xs flex items-center justify-center flex-shrink-0 text-black mt-0.5">
+              <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
             <div>
-              <h4 class="font-semibold text-slate-800 mb-1">
+              <h4 class="font-semibold text-slate-900 mb-1">
                 Column Sorting
               </h4>
               <p class="text-sm text-slate-600">
@@ -154,12 +176,14 @@
             </div>
           </div>
           <div class="flex items-start gap-3">
-            <svg class="w-6 h-6 text-green-600 flex-shrink-0 mt-1" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
+            <div
+              class="w-7 h-7 rounded-lg bg-orange-100 border border-orange-200/80 shadow-xs flex items-center justify-center flex-shrink-0 text-black mt-0.5">
+              <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
             <div>
-              <h4 class="font-semibold text-slate-800 mb-1">
+              <h4 class="font-semibold text-slate-900 mb-1">
                 Mobile Responsive
               </h4>
               <p class="text-sm text-slate-600">
@@ -206,10 +230,12 @@
               <input id="filter" placeholder='Find metrics or values (e.g. "breakout", "900", "crack")...'
                 class="w-full px-4 py-2.5 pr-36 bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DF4907] focus:border-[#DF4907] text-slate-900 text-sm" />
               <div class="absolute right-2.5 flex items-center gap-1">
-                <span id="searchMatchCount" class="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded hidden">
+                <span id="searchMatchCount"
+                  class="text-xs font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded hidden">
                   0 of 0
                 </span>
-                <button id="searchPrevBtn" type="button" title="Previous match (Shift+Enter)" aria-label="Previous match" disabled
+                <button id="searchPrevBtn" type="button" title="Previous match (Shift+Enter)"
+                  aria-label="Previous match" disabled
                   class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
@@ -221,13 +247,16 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                <button id="searchSoundToggle" type="button" title="Jump sound effect (Click to mute/unmute)" aria-label="Toggle jump sound"
+                <button id="searchSoundToggle" type="button" title="Jump sound effect (Click to mute/unmute)"
+                  aria-label="Toggle jump sound"
                   class="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors">
                   <svg id="soundIconOn" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                   </svg>
                   <svg id="soundIconOff" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l4-4m0 4l-4-4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l4-4m0 4l-4-4" />
                   </svg>
                 </button>
                 <button id="clearFilter" type="button" title="Clear search (Esc)" aria-label="Clear search"
@@ -306,7 +335,8 @@
           <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-4">
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Company 1</label>
-              <select id="compareCompany1" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DF4907] focus:border-[#DF4907] text-slate-700">
+              <select id="compareCompany1"
+                class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DF4907] focus:border-[#DF4907] text-slate-700">
                 <option value="">All Companies</option>
               </select>
             </div>
@@ -321,7 +351,8 @@
           <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-4">
             <div>
               <label class="block text-sm font-semibold text-slate-700 mb-2">Company 2</label>
-              <select id="compareCompany2" class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DF4907] focus:border-[#DF4907] text-slate-700">
+              <select id="compareCompany2"
+                class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#DF4907] focus:border-[#DF4907] text-slate-700">
                 <option value="">All Companies</option>
               </select>
             </div>
@@ -353,14 +384,6 @@
         </div>
       </section>
     </main>
-
-    <footer class="mt-8 text-center text-sm text-slate-500">
-      <p>
-        Files served from the local
-        <code class="px-2 py-1 bg-slate-200 rounded text-slate-700">data/</code>
-        folder
-      </p>
-    </footer>
   </div>
 
   <!-- MVC Architecture: Load in order - Model, Views, Controllers, App -->
