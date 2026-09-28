@@ -107,18 +107,32 @@ class CompareController {
       return null;
     }
 
+    const failureModeNames = {
+      "φNsa": "Steel",
+      "φNcb": "Concrete breakout",
+      "φNp": "Pullout",
+      "φVsa": "Steel",
+      "φVcp": "Pryout",
+    };
+
     function getMinimumPhi(h, keys) {
-      const values = keys
-        .map((key) => getPhi(h, key))
+      const candidates = keys
+        .map((key) => ({ key, value: getPhi(h, key) }))
         .filter(
-          (value) => value !== null && value !== undefined && value !== "" && value !== "NP",
+          ({ value }) => value !== null && value !== undefined && value !== "" && value !== "NP",
         )
-        .map((value) => Number(value))
-        .filter((value) => !Number.isNaN(value));
+        .map(({ key, value }) => ({ key, value: Number(value) }))
+        .filter(({ value }) => !Number.isNaN(value));
 
-      if (values.length === 0) return null;
+      if (candidates.length === 0) return null;
 
-      return Math.min(...values);
+      const minimum = candidates.reduce((lowest, candidate) =>
+        candidate.value < lowest.value ? candidate : lowest,
+      );
+      return {
+        value: minimum.value,
+        failureMode: failureModeNames[minimum.key],
+      };
     }
 
     // Build tension series
@@ -138,7 +152,12 @@ class CompareController {
       });
       return {
         name: product.name?.value || product.name || `Product ${idx + 1}`,
-        data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
+        data: leafOrder.map(({ size, hef }) => {
+          const result = map.get(`${size}-${hef}`);
+          return result
+            ? { y: result.value, custom: { failureMode: result.failureMode } }
+            : null;
+        }),
         color: this.view.colors[idx % this.view.colors.length],
         productId: idx,
       };
@@ -158,7 +177,12 @@ class CompareController {
       });
       return {
         name: product.name?.value || product.name || `Product ${idx + 1}`,
-        data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
+        data: leafOrder.map(({ size, hef }) => {
+          const result = map.get(`${size}-${hef}`);
+          return result
+            ? { y: result.value, custom: { failureMode: result.failureMode } }
+            : null;
+        }),
         color: this.view.colors[idx % this.view.colors.length],
         productId: idx,
       };
@@ -185,21 +209,32 @@ class CompareController {
     const background = [];
     const foreground = [];
     for (let i = 0; i < a.data.length; i++) {
-      const va = a.data[i];
-      const vb = b.data[i];
+      const pointA = a.data[i];
+      const pointB = b.data[i];
+      const va = pointA?.y ?? pointA;
+      const vb = pointB?.y ?? pointB;
+      const makeLayerPoint = (point, value, product) => ({
+        y: value,
+        color: product.color,
+        custom: {
+          ...point?.custom,
+          origName: product.name,
+          productId: product.productId,
+        },
+      });
       if (va == null && vb == null) {
         background.push(null);
         foreground.push(null);
       } else if (vb == null || (va != null && va >= vb)) {
-        background.push({ y: va, color: a.color, custom: { origName: a.name, productId: a.productId } });
+        background.push(makeLayerPoint(pointA, va, a));
         foreground.push(
           vb == null
             ? null
-            : { y: vb, color: b.color, custom: { origName: b.name, productId: b.productId } },
+            : makeLayerPoint(pointB, vb, b),
         );
       } else {
-        background.push({ y: vb, color: b.color, custom: { origName: b.name, productId: b.productId } });
-        foreground.push({ y: va, color: a.color, custom: { origName: a.name, productId: a.productId } });
+        background.push(makeLayerPoint(pointB, vb, b));
+        foreground.push(makeLayerPoint(pointA, va, a));
       }
     }
 
