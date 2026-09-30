@@ -6,6 +6,28 @@ class CompareView {
     this.model = model;
     this.container = document.getElementById("compareContainer");
     this.colors = ["#DF4907", "#0F172A", "#F59E0B", "#94A3B8", "#22C55E"];
+    this.bindPrintReflow();
+  }
+
+  /**
+   * Highcharts measures the container in pixels once at creation and won't shrink that
+   * fixed SVG width on its own for the narrower print page. Reflow on "beforeprint" (and
+   * via matchMedia as a fallback) so each chart re-measures against the print layout.
+   * Bound once per page load since every CompareView instance shares the same window.
+   */
+  bindPrintReflow() {
+    if (CompareView.__printReflowBound) return;
+    CompareView.__printReflowBound = true;
+
+    const reflowCharts = () => {
+      (window.Highcharts?.charts || []).forEach((chart) => chart && chart.reflow());
+    };
+    window.addEventListener("beforeprint", reflowCharts);
+    if (window.matchMedia) {
+      window.matchMedia("print").addEventListener("change", (e) => {
+        if (e.matches) reflowCharts();
+      });
+    }
   }
 
   /**
@@ -49,6 +71,13 @@ class CompareView {
   render(productsData, concreteState, chartData) {
     this.container.innerHTML = "";
 
+    // Print-only header + watermark; hidden on screen, shown via @media print.
+    this.container.appendChild(this.buildPrintReportHeader());
+    this.container.appendChild(this.buildPrintWatermark());
+
+    // Export/Print toolbar (hidden when printing)
+    this.container.appendChild(this.buildExportToolbar());
+
     // Optionally show the selected concrete state
     if (concreteState) {
       const stateBanner = document.createElement("div");
@@ -65,6 +94,120 @@ class CompareView {
     if (chartData && chartData.tension && chartData.shear) {
       this.renderChartsSection(chartData);
     }
+  }
+
+  /**
+   * Print-only header shown at the top of the printed/exported report.
+   * Populated with the preparer's name right before printing.
+   */
+  buildPrintReportHeader() {
+    const header = document.createElement("div");
+    header.className = "print-report-header";
+    header.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <div style="font-size:18px; font-weight:800; color:#0f172a;">Anchor Size Specifications Comparison</div>
+          <div style="font-size:11px; color:#9a3412; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;">Internal Only &mdash; Do Not Distribute</div>
+        </div>
+        <div style="text-align:right; font-size:11px; color:#475569;">
+          <div>Generated: <span class="print-report-date">-</span></div>
+          <div>Prepared by: <span class="print-report-preparer">-</span></div>
+        </div>
+      </div>
+    `;
+    return header;
+  }
+
+  /**
+   * Single centered diagonal "INTERNAL ONLY" watermark; repeats once per printed
+   * page because it's position:fixed, not because the markup itself is tiled.
+   */
+  buildPrintWatermark() {
+    const watermark = document.createElement("div");
+    watermark.className = "print-watermark";
+    const label = document.createElement("span");
+    label.textContent = "INTERNAL ONLY";
+    watermark.appendChild(label);
+    return watermark;
+  }
+
+  /**
+   * Toolbar with the Export/Print entry point (hidden in the printed output).
+   */
+  buildExportToolbar() {
+    const toolbar = document.createElement("div");
+    toolbar.className = "no-print flex justify-end mb-4";
+
+    const printBtn = document.createElement("button");
+    printBtn.type = "button";
+    printBtn.className =
+      "inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold text-sm transition-colors";
+    printBtn.innerHTML = `
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m0 0v4a1 1 0 001 1h8a1 1 0 001-1v-4m-10 0h10M7 9V4a1 1 0 011-1h8a1 1 0 011 1v5" />
+      </svg>
+      Export / Print Report
+    `;
+    printBtn.addEventListener("click", () => this.openExportModal());
+
+    toolbar.appendChild(printBtn);
+    return toolbar;
+  }
+
+  /**
+   * Small modal asking for an optional preparer name, then triggers window.print().
+   * There is no sign-in system yet, so the name is entered manually rather than pulled
+   * from an authenticated session.
+   */
+  openExportModal() {
+    const savedName = localStorage.getItem("ancom_report_preparer") || "";
+
+    const overlay = document.createElement("div");
+    overlay.className =
+      "no-print fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50";
+    overlay.innerHTML = `
+      <div class="bg-white rounded-xl shadow-xl border border-slate-200 p-6 w-full max-w-sm">
+        <h3 class="text-lg font-bold text-slate-800 mb-1">Export / Print Report</h3>
+        <p class="text-sm text-slate-500 mb-4">This report is for internal use only. Enter your name so it's recorded on the printed copy.</p>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Prepared by (optional)</label>
+        <input type="text" class="export-preparer-input w-full px-3 py-2 border border-slate-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-[#DF4907]" placeholder="Your name" value="${savedName.replace(/"/g, "&quot;")}" />
+        <div class="flex justify-end gap-2">
+          <button type="button" class="export-cancel-btn px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 font-medium">Cancel</button>
+          <button type="button" class="export-confirm-btn px-4 py-2 rounded-lg bg-[#DF4907] hover:bg-[#c23f06] text-white font-semibold">Print</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const input = overlay.querySelector(".export-preparer-input");
+    input.focus();
+
+    const close = () => overlay.remove();
+    overlay.querySelector(".export-cancel-btn").addEventListener("click", close);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) close();
+    });
+    overlay.querySelector(".export-confirm-btn").addEventListener("click", () => {
+      const preparer = input.value.trim();
+      localStorage.setItem("ancom_report_preparer", preparer);
+      close();
+      this.printReport(preparer);
+    });
+  }
+
+  /**
+   * Stamps the print header with the preparer name/timestamp, then opens the browser print dialog.
+   */
+  printReport(preparer) {
+    const dateEl = this.container.querySelector(".print-report-date");
+    const preparerEl = this.container.querySelector(".print-report-preparer");
+    if (dateEl) dateEl.textContent = new Date().toLocaleString();
+    if (preparerEl) preparerEl.textContent = preparer || "Not specified";
+
+    // Defensive reflow in case "beforeprint" fires too late in this browser;
+    // the real fix is the bindPrintReflow() listener re-measuring at print time.
+    (window.Highcharts?.charts || []).forEach((chart) => chart && chart.reflow());
+    window.print();
   }
 
   /**
@@ -177,8 +320,10 @@ class CompareView {
     chartTitle.textContent = "Anchor Size Specifications Comparison";
     chartsSection.appendChild(chartTitle);
 
+    // Plain block stacking (not grid/flex) so print's `break-inside: avoid`
+    // on each chart card is actually honored by Chromium's page fragmentation.
     const chartsGrid = document.createElement("div");
-    chartsGrid.className = "grid grid-cols-1 gap-6";
+    chartsGrid.className = "space-y-6";
 
     // Tension chart
     const tensionChartDiv = this.createChartContainer(
@@ -208,7 +353,8 @@ class CompareView {
    */
   createChartContainer(id, title) {
     const div = document.createElement("div");
-    div.className = "bg-white p-6 rounded-xl border border-slate-100 shadow-sm transition-shadow hover:shadow-md";
+    div.className =
+      "chart-print-card bg-white p-6 rounded-xl border border-slate-100 shadow-sm transition-shadow hover:shadow-md";
 
     const titleEl = document.createElement("h3");
     titleEl.className = "text-xl font-bold text-slate-800 mb-4 text-center";

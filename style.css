@@ -344,6 +344,70 @@
   background-color: #fffaf5;
 }
 
+/* ── Report Export / Print (compare view) ────────────── */
+.print-report-header,
+.print-watermark {
+  display: none;
+}
+
+@media print {
+  @page {
+    /* Comparison charts have a long x-axis (many sizes/products); landscape gives Highcharts
+       more usable width so it doesn't have to squeeze/clip its screen-measured SVG. */
+    size: landscape;
+    margin: 12mm;
+  }
+
+  /* Reset the app shell's scroll/height chrome so the report can flow
+     across as many printed pages as it needs without being clipped. */
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .container.mx-auto {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-report-header {
+    display: block !important;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #DF4907;
+  }
+
+  .print-watermark {
+    display: flex !important;
+    position: fixed;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .print-watermark span {
+    transform: rotate(-30deg);
+    font-size: 72px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: #000000;
+    white-space: nowrap;
+  }
+
+  #compareContainer .chart-print-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
 #tableContainer tr.frozen-row-2 td {
   position: sticky;
   top: var(--frozen-row-1-height, 37px);
