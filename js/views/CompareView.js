@@ -460,11 +460,13 @@ class CompareView {
             (g) => ptIdx >= g.startIndex && ptIdx <= g.endIndex,
           );
           const productName = this.point.custom?.origName || this.series.name;
+          const failureMode = this.point.custom?.failureMode || "Unavailable";
           return (
             `<div style="font-family: inherit; color: #334155;">` +
             `<div style="font-size:13px; font-weight:700; color: #0f172a; margin-bottom: 6px;">${productName}</div>` +
             `<div style="font-size:12px; margin-bottom: 4px;">Diameter: <span style="font-weight:600;">Ø ${grp ? grp.size : ""}</span> &mdash; h<sub style="font-size:9px">ef</sub>: <span style="font-weight:600;">${this.point.category} in.</span></div>` +
             `<div style="font-size:12px;">Strength: <span style="font-weight:700; color: #DF4907;">${Highcharts.numberFormat(this.y || 0, 0, ".", ",")} lbs</span></div>` +
+            `<div style="font-size:12px;">Governing failure mode: <span style="font-weight:600;">${failureMode}</span></div>` +
             `</div>`
           );
         },
