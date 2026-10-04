@@ -78,16 +78,7 @@ class CompareView {
     // Export/Print toolbar (hidden when printing)
     this.container.appendChild(this.buildExportToolbar());
 
-    // Optionally show the selected concrete state
-    if (concreteState) {
-      const stateBanner = document.createElement("div");
-      stateBanner.className =
-        "mb-4 px-4 py-2 rounded bg-[#ffedd5] text-[#9a3412] font-semibold inline-block";
-      stateBanner.textContent = `Concrete State: ${concreteState.charAt(0).toUpperCase() + concreteState.slice(1)}`;
-      this.container.appendChild(stateBanner);
-    }
-
-    // Overview section
+    // Overview section (with integrated concrete state)
     this.renderOverview(productsData, concreteState);
 
     // Charts section (if chartData provided)
@@ -126,7 +117,7 @@ class CompareView {
     const watermark = document.createElement("div");
     watermark.className = "print-watermark";
     const label = document.createElement("span");
-    label.textContent = "INTERNAL ONLY";
+    label.textContent = "Simpson Strong‑Tie";
     watermark.appendChild(label);
     return watermark;
   }
@@ -213,16 +204,35 @@ class CompareView {
   /**
    * Render overview table
    */
-  renderOverview(productsData) {
+  renderOverview(productsData, concreteState) {
     const overviewSection = document.createElement("div");
     overviewSection.className =
       "bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden";
 
+    const cardHeader = document.createElement("div");
+    cardHeader.className =
+      "px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white flex flex-wrap items-center justify-between gap-3";
+
     const title = document.createElement("h2");
     title.className =
-      "text-2xl font-bold text-slate-800 px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-orange-50 to-slate-50";
+      "text-xl sm:text-2xl font-bold text-slate-800 tracking-tight";
     title.textContent = "Product Comparison Overview";
-    overviewSection.appendChild(title);
+    cardHeader.appendChild(title);
+
+    if (concreteState) {
+      const stateName =
+        concreteState.charAt(0).toUpperCase() + concreteState.slice(1);
+      const stateBadge = document.createElement("div");
+      stateBadge.className =
+        "inline-flex items-center gap-2.5 px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl shadow-xs";
+      stateBadge.innerHTML = `
+        <span class="text-sm font-semibold text-slate-600">Concrete State:</span>
+        <span class="px-2.5 py-1 rounded-lg bg-[#ffb3c6] text-slate-900 text-sm font-extrabold uppercase tracking-wider shadow-2xs">${stateName}</span>
+      `;
+      cardHeader.appendChild(stateBadge);
+    }
+
+    overviewSection.appendChild(cardHeader);
 
     const wrapper = document.createElement("div");
     wrapper.className = "overflow-x-auto";
@@ -268,12 +278,12 @@ class CompareView {
       (data) => (data.anchorSizes?.length || 0) + " sizes",
     );
 
-    // Total configurations row
+    // Type of Anchor row
     this.addOverviewRow(
       tbody,
-      "Total Configurations",
+      "Type of Anchor",
       productsData,
-      (data) => this.model.getTotalRowCount(data) + " configurations",
+      (data) => data.anchorType?.value || "-",
     );
 
     table.appendChild(tbody);
