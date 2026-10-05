@@ -26,31 +26,41 @@ class CompareController {
       anchorSize?.effectiveEmbedmentDepths ||
       [];
 
-    // Collect unique anchor sizes across all products
-    const uniqueSizes = new Set();
-    productsData.forEach((product) => {
-      (product.anchorSizes || []).forEach((a) => {
-        const size = getAnchorSize(a).value;
-        if (size) uniqueSizes.add(size);
-      });
-    });
-    const allSizes = Array.from(uniqueSizes).sort(
-      (a, b) => parseSize(a) - parseSize(b),
-    );
+    const isHefSupported = (h, state) => {
+      if (!h) return false;
+      if (state === "cracked") {
+        return typeof h.supportsCrackedConcrete === "function"
+          ? h.supportsCrackedConcrete()
+          : Boolean(h.crackedConcreteData?.value);
+      }
+      if (state === "uncracked") {
+        return typeof h.supportsUncrackedConcrete === "function"
+          ? h.supportsUncrackedConcrete()
+          : true;
+      }
+      return true;
+    };
 
-    // For each size collect all hef values from all products
+    // Collect all supported hef values for each anchor size across all products
     const sizeToHefs = new Map();
     productsData.forEach((product) => {
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
-        const size = anchorSize.value;
+        const size = anchorSize.value?.value || anchorSize.value;
         if (!size) return;
-        if (!sizeToHefs.has(size)) sizeToHefs.set(size, new Set());
-        getEmbedmentDepths(anchorSize).forEach((h) =>
-          sizeToHefs.get(size).add(h.value),
-        );
+
+        getEmbedmentDepths(anchorSize).forEach((h) => {
+          if (isHefSupported(h, concreteState)) {
+            if (!sizeToHefs.has(size)) sizeToHefs.set(size, new Set());
+            sizeToHefs.get(size).add(h.value?.value || h.value);
+          }
+        });
       });
     });
+
+    const allSizes = Array.from(sizeToHefs.keys()).sort(
+      (a, b) => parseSize(a) - parseSize(b),
+    );
 
     // Build flat x-axis categories + groups metadata for plotBands/plotLines.
     // One slot per hef; grouping:false lets each series render independently
@@ -77,38 +87,52 @@ class CompareController {
 
     // Helper to get the correct phi value based on concrete state
     function getPhi(h, key) {
-      if (key === "φNsa") return h.tensionSteelStrength ?? null;
-      if (key === "φVsa") return h.shearSteelStrength ?? null;
+      if (key === "φNsa") return h.tensionSteelStrength?.value ?? null;
+      if (key === "φVsa") return h.shearSteelStrength?.value ?? null;
       if (key === "φNcb") {
         return concreteState === "cracked"
-          ? h.tensionBreakoutCracked
-          : h.tensionBreakoutUncracked;
+          ? h.tensionBreakoutCracked?.value
+          : h.tensionBreakoutUncracked?.value;
       }
       if (key === "φNp") {
         return concreteState === "cracked"
-          ? h.pulloutCracked
-          : h.pulloutUncracked;
+          ? h.pulloutCracked?.value
+          : h.pulloutUncracked?.value;
       }
       if (key === "φVcp") {
         return concreteState === "cracked"
-          ? h.pryoutCracked
-          : h.pryoutUncracked;
+          ? h.pryoutCracked?.value
+          : h.pryoutUncracked?.value;
       }
       return null;
     }
 
+    const failureModeNames = {
+      "φNsa": "Steel",
+      "φNcb": "Concrete breakout",
+      "φNp": "Pullout",
+      "φVsa": "Steel",
+      "φVcp": "Pryout",
+    };
+
     function getMinimumPhi(h, keys) {
-      const values = keys
-        .map((key) => getPhi(h, key))
+      const candidates = keys
+        .map((key) => ({ key, value: getPhi(h, key) }))
         .filter(
-          (value) => value !== null && value !== undefined && value !== "",
+          ({ value }) => value !== null && value !== undefined && value !== "" && value !== "NP",
         )
-        .map((value) => Number(value))
-        .filter((value) => !Number.isNaN(value));
+        .map(({ key, value }) => ({ key, value: Number(value) }))
+        .filter(({ value }) => !Number.isNaN(value));
 
-      if (values.length === 0) return null;
+      if (candidates.length === 0) return null;
 
-      return Math.min(...values);
+      const minimum = candidates.reduce((lowest, candidate) =>
+        candidate.value < lowest.value ? candidate : lowest,
+      );
+      return {
+        value: minimum.value,
+        failureMode: failureModeNames[minimum.key],
+      };
     }
 
     // Build tension series
@@ -116,18 +140,26 @@ class CompareController {
       const map = new Map();
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
-        const size = anchorSize.value;
+        const size = anchorSize.value?.value || anchorSize.value;
         getEmbedmentDepths(anchorSize).forEach((h) => {
-          map.set(
-            `${size}-${h.value}`,
-            getMinimumPhi(h, ["φNsa", "φNcb", "φNp"]),
-          );
+          if (isHefSupported(h, concreteState)) {
+            map.set(
+              `${size}-${h.value?.value || h.value}`,
+              getMinimumPhi(h, ["φNsa", "φNcb", "φNp"]),
+            );
+          }
         });
       });
       return {
-        name: product.name || `Product ${idx + 1}`,
-        data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
+        name: product.name?.value || product.name || `Product ${idx + 1}`,
+        data: leafOrder.map(({ size, hef }) => {
+          const result = map.get(`${size}-${hef}`);
+          return result
+            ? { y: result.value, custom: { failureMode: result.failureMode } }
+            : null;
+        }),
         color: this.view.colors[idx % this.view.colors.length],
+        productId: idx,
       };
     });
 
@@ -136,23 +168,84 @@ class CompareController {
       const map = new Map();
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
-        const size = anchorSize.value;
+        const size = anchorSize.value?.value || anchorSize.value;
         getEmbedmentDepths(anchorSize).forEach((h) => {
-          map.set(`${size}-${h.value}`, getMinimumPhi(h, ["φVsa", "φVcp"]));
+          if (isHefSupported(h, concreteState)) {
+            map.set(`${size}-${h.value?.value || h.value}`, getMinimumPhi(h, ["φVsa", "φVcp"]));
+          }
         });
       });
       return {
-        name: product.name || `Product ${idx + 1}`,
-        data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
+        name: product.name?.value || product.name || `Product ${idx + 1}`,
+        data: leafOrder.map(({ size, hef }) => {
+          const result = map.get(`${size}-${hef}`);
+          return result
+            ? { y: result.value, custom: { failureMode: result.failureMode } }
+            : null;
+        }),
         color: this.view.colors[idx % this.view.colors.length],
+        productId: idx,
       };
     });
 
     return {
-      tension: { flatCategories, groups, series: tensionSeries },
-      shear: { flatCategories, groups, series: shearSeries },
+      tension: { flatCategories, groups, series: this.layerSeriesByHeight(tensionSeries) },
+      shear: { flatCategories, groups, series: this.layerSeriesByHeight(shearSeries) },
     };
   }
+
+  /**
+   * Re-order exactly-2-product series into background/foreground render layers so the
+   * shorter bar at each x-position always draws on top instead of being hidden by the taller one.
+   * Legend-only proxy series preserve the original product names/colors in the legend.
+   * Points carry identity under `custom` (Highcharts' reserved namespace for arbitrary point
+   * data) so hover/selection reliably reads the actual product, not the height role/layer.
+   * @param {Array} originalSeries - [{ name, data, color, productId }, { name, data, color, productId }]
+   */
+  layerSeriesByHeight(originalSeries) {
+    const [a, b] = originalSeries;
+    if (!a || !b) return originalSeries;
+
+    const background = [];
+    const foreground = [];
+    for (let i = 0; i < a.data.length; i++) {
+      const pointA = a.data[i];
+      const pointB = b.data[i];
+      const va = pointA?.y ?? pointA;
+      const vb = pointB?.y ?? pointB;
+      const makeLayerPoint = (point, value, product) => ({
+        y: value,
+        color: product.color,
+        custom: {
+          ...point?.custom,
+          origName: product.name,
+          productId: product.productId,
+        },
+      });
+      if (va == null && vb == null) {
+        background.push(null);
+        foreground.push(null);
+      } else if (vb == null || (va != null && va >= vb)) {
+        background.push(makeLayerPoint(pointA, va, a));
+        foreground.push(
+          vb == null
+            ? null
+            : makeLayerPoint(pointB, vb, b),
+        );
+      } else {
+        background.push(makeLayerPoint(pointB, vb, b));
+        foreground.push(makeLayerPoint(pointA, va, a));
+      }
+    }
+
+    return [
+      { name: a.name, color: a.color, productId: a.productId, data: [], showInLegend: true, enableMouseTracking: false, zIndex: 0 },
+      { name: b.name, color: b.color, productId: b.productId, data: [], showInLegend: true, enableMouseTracking: false, zIndex: 0 },
+      { id: "__background", name: "__background", data: background, showInLegend: false, zIndex: 1 },
+      { id: "__foreground", name: "__foreground", data: foreground, showInLegend: false, zIndex: 2 },
+    ];
+  }
+
 
   constructor(model, view) {
     this.model = model;
@@ -172,6 +265,8 @@ class CompareController {
     this.concreteStateRadios = document.querySelectorAll(
       'input[name="concreteState"]',
     );
+    this.compareCompany1 = document.getElementById("compareCompany1");
+    this.compareCompany2 = document.getElementById("compareCompany2");
   }
 
   /**
@@ -179,31 +274,117 @@ class CompareController {
    */
   bindEvents() {
     this.compareBtn?.addEventListener("click", () => this.handleCompare());
+    this.concreteStateRadios.forEach((radio) => {
+      radio.addEventListener("change", () => this.handleConcreteStateChange());
+    });
+    this.compareCompany1?.addEventListener("change", () => this.handleCompanyFilterChange(1));
+    this.compareCompany2?.addEventListener("change", () => this.handleCompanyFilterChange(2));
   }
 
   /**
    * Initialize with products
    */
   async initialize() {
-    const products = this.model.getProducts();
-    this.populateCompareSelects(products);
+    this.updateCompareSelects();
   }
 
   /**
-   * Populate comparison dropdowns
+   * Handle change on concrete state radio buttons
    */
-  populateCompareSelects(products) {
-    [this.compareProduct1, this.compareProduct2].forEach((select) => {
-      if (select) {
-        select.innerHTML = '<option value="">Select a product...</option>';
-        products.forEach((p) => {
-          const opt = document.createElement("option");
-          opt.value = p;
-          opt.textContent = p.replace(/\.json$/, "");
-          select.appendChild(opt);
-        });
+  handleConcreteStateChange() {
+    this.updateCompareSelects();
+  }
+
+  /**
+   * Handle change on company filter dropdown
+   */
+  handleCompanyFilterChange(index) {
+    this.updateCompareSelects(index);
+  }
+
+  /**
+   * Update compare selects based on currently selected concrete state and company filter
+   */
+  updateCompareSelects(index) {
+    const concreteState = this.getConcreteState();
+    let allProducts = this.model.getProducts(concreteState);
+
+    // Only update company lists when concrete state changes (i.e. no index provided)
+    if (!index) {
+      this.populateCompanyFilters(allProducts);
+    }
+
+    if (!index || index === 1) {
+      this.updateProductSelect(this.compareCompany1, this.compareProduct1, allProducts);
+    }
+    if (!index || index === 2) {
+      this.updateProductSelect(this.compareCompany2, this.compareProduct2, allProducts);
+    }
+  }
+
+  /**
+   * Populate company filter dropdowns
+   */
+  populateCompanyFilters(products) {
+    const companies = [
+      ...new Set(
+        products
+          .map((p) => p.company?.value || p.company)
+          .filter(Boolean),
+      ),
+    ].sort();
+
+    [this.compareCompany1, this.compareCompany2].forEach((select) => {
+      if (!select) return;
+      const currentCompany = select.value;
+      select.innerHTML = '<option value="">All Companies</option>';
+
+      companies.forEach((company) => {
+        const opt = document.createElement("option");
+        opt.value = company;
+        opt.textContent = company;
+        select.appendChild(opt);
+      });
+
+      if (companies.includes(currentCompany)) {
+        select.value = currentCompany;
+      } else {
+        select.value = "";
       }
     });
+  }
+
+  /**
+   * Update a specific product select based on its company filter
+   */
+  updateProductSelect(companySelect, productSelect, allProducts) {
+    if (!productSelect) return;
+
+    let products = allProducts;
+    const selectedCompany = companySelect?.value;
+    if (selectedCompany) {
+      products = products.filter(
+        (p) => (p.company?.value) === selectedCompany,
+      );
+    }
+
+    const currentValue = productSelect.value;
+    productSelect.innerHTML = '<option value="">Select a product...</option>';
+
+    products.forEach((p) => {
+      const opt = document.createElement("option");
+      const filename = p.filename || p.name;
+      const label = typeof p.getDisplayName === "function" ? p.getDisplayName() : p.name || p.filename;
+      opt.value = filename;
+      opt.textContent = label;
+      productSelect.appendChild(opt);
+    });
+
+    if (currentValue && products.some((p) => (p.filename || p.name) === currentValue)) {
+      productSelect.value = currentValue;
+    } else {
+      productSelect.value = "";
+    }
   }
 
   /**

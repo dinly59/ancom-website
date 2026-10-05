@@ -9,25 +9,75 @@ class TableView {
     this.sortAscending = true;
     this.currentPage = 1;
     this.PAGE_SIZE = 10;
-    // Row labels (metrics) - transposed from columns
-    this.rowMetrics = [
-      { label: "Anchor Size", key: "anchorSize" },
-      { label: "Drill Bit", key: "drillBit" },
-      { label: "h<sub>ef</sub>", key: "hef" },
-      { label: "h<sub>nom</sub>", key: "hnom" },
-      { label: "h<sub>hole</sub>", key: "hhole" },
-      { label: "Cracked", key: "cracked" },
-      { label: "Seismic", key: "seismic" },
-      { label: "Category", key: "category" },
-      { label: "φN<sub>sa</sub>", key: "φNsa" },
-      { label: "φN<sub>cb</sub>", key: "φNcb" },
-      { label: "φN<sub>cb_cr</sub>", key: "φNcb_cr" },
-      { label: "φN<sub>p_uncr</sub>", key: "φNp_uncr" },
-      { label: "φN<sub>p_cr</sub>", key: "φNp_cr" },
-      { label: "φV<sub>sa</sub>", key: "φVsa" },
-      { label: "φV<sub>cp_uncr</sub>", key: "φVcp_uncr" },
-      { label: "φV<sub>cp_cr</sub>", key: "φVcp_cr" },
-    ];
+    this.rowMetrics = []; // will be set dynamically
+    this.matches = [];
+    this.currentMatchIndex = -1;
+    this.searchTerm = "";
+    this.onSearchMatchChange = null;
+    this.flashTimeout = null;
+    this.soundEnabled = true;
+    this.audioCtx = null;
+  }
+
+  /**
+   * Determine category group for a metric label (Tailwind UI grouped rows)
+   */
+  getMetricCategory(label) {
+    if (!label) return "General & Installation Specifications";
+    const t = label.toLowerCase();
+    if (
+      t.includes("tension") ||
+      t.includes("pullout") ||
+      t.includes("breakout") ||
+      t.includes("ductility")
+    ) {
+      return "Tension Design Specifications";
+    }
+    if (
+      t.includes("shear") ||
+      t.includes("pryout") ||
+      t.includes("vsa") ||
+      t.includes("vcp")
+    ) {
+      return "Shear Design Specifications";
+    }
+    return "General & Installation Specifications";
+  }
+
+  /**
+   * Format technical notation into HTML subscripts (e.g. hef -> h<sub>ef</sub>, Np,uncr -> N<sub>p,uncr</sub>)
+   */
+  formatLabelWithSubscripts(label) {
+    if (!label) return "";
+    if (label.includes("<sub>")) return label;
+
+    return label
+      // Compound subscripts with commas (must match first before simpler terms)
+      .replace(/\bNp,uncr\b/g, "N<sub>p,uncr</sub>")
+      .replace(/\bNp,cr\b/g, "N<sub>p,cr</sub>")
+      .replace(/\bNp,eq\b/g, "N<sub>p,eq</sub>")
+      .replace(/\bNcb,uncr\b/g, "N<sub>cb,uncr</sub>")
+      .replace(/\bNcb,cr\b/g, "N<sub>cb,cr</sub>")
+      .replace(/\bVcp,uncr\b/g, "V<sub>cp,uncr</sub>")
+      .replace(/\bVcp,cr\b/g, "V<sub>cp,cr</sub>")
+      .replace(/\bVsa,eq\b/g, "V<sub>sa,eq</sub>")
+      // Simple single-term subscripts
+      .replace(/\bhef\b/g, "h<sub>ef</sub>")
+      .replace(/\bhnom\b/g, "h<sub>nom</sub>")
+      .replace(/\bhhole\b/g, "h<sub>hole</sub>")
+      .replace(/\bcmin\b/g, "c<sub>min</sub>")
+      .replace(/\bsmin\b/g, "s<sub>min</sub>")
+      .replace(/\bhmin\b/g, "h<sub>min</sub>")
+      .replace(/\bNsa\b/g, "N<sub>sa</sub>")
+      .replace(/\bVsa\b/g, "V<sub>sa</sub>")
+      .replace(/\bNcb\b/g, "N<sub>cb</sub>")
+      .replace(/\bVcb\b/g, "V<sub>cb</sub>")
+      .replace(/\bVcp\b/g, "V<sub>cp</sub>")
+      .replace(/\bNp\b/g, "N<sub>p</sub>")
+      .replace(/\bkuncr\b/g, "k<sub>uncr</sub>")
+      .replace(/\bkcr\b/g, "k<sub>cr</sub>")
+      .replace(/\bkcp\b/g, "k<sub>cp</sub>")
+      .replace(/\bf'c\b/g, "f'<sub>c</sub>");
   }
 
   /**
@@ -61,13 +111,104 @@ class TableView {
   }
 
   /**
+   * Show empty placeholder when no product is selected
+   */
+  showEmptyState(message = "Please select a product to view specifications.") {
+    this.container.innerHTML = `
+      <div class="text-center py-16 text-slate-500 bg-white rounded-xl shadow-sm border border-slate-200">
+        <svg class="inline-block w-16 h-16 mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <p class="text-lg font-medium text-slate-600">${message}</p>
+      </div>
+    `;
+  }
+
+  /**
    * Render the product data table (transposed view)
    */
-  render(data, filter = "") {
+  render(data, filter = "", compactMode = false) {
     this.container.innerHTML = "";
     if (!data) {
       this.showError("No data available");
       return;
+    }
+
+    if (compactMode) {
+      const sampleAnchor = data.anchorSizes?.[0];
+      const sampleHef = sampleAnchor?.effectiveEmbedmentDepths?.[0];
+
+      const compactParams = sampleHef
+        ? [
+          sampleAnchor?.value,
+          sampleHef.value,
+          sampleHef.drillBitDiameter,
+          sampleHef.nominalEmbedmentDepth,
+          sampleHef.minimumHoleDepth,
+          sampleHef.crackedConcreteData,
+          sampleHef.seismicCategories,
+          sampleHef.anchorCategory,
+          sampleHef.tensionSteelStrength,
+          sampleHef.tensionBreakoutUncracked,
+          sampleHef.tensionBreakoutCracked,
+          sampleHef.pulloutUncracked,
+          sampleHef.pulloutCracked,
+          sampleHef.shearSteelStrength,
+          sampleHef.pryoutUncracked,
+          sampleHef.pryoutCracked,
+        ].filter(
+          (p) =>
+            p &&
+            p.constructor &&
+            p.constructor.name === "Parameter" &&
+            p.title,
+        )
+        : [];
+
+      this.rowMetrics = compactParams.map((p) => ({
+        label: p.title,
+        key: p.title,
+      }));
+    } else {
+      const dynamicFullMetricsMap = new Map();
+
+      // Collect parameters from AnchorSizes and EffectiveEmbedmentDepths for body rows
+      const anchorSizes = data.anchorSizes || [];
+      anchorSizes.forEach((a) => {
+        if (
+          a.value &&
+          a.value.constructor &&
+          a.value.constructor.name === "Parameter" &&
+          a.value.title
+        ) {
+          if (!dynamicFullMetricsMap.has(a.value.title)) {
+            dynamicFullMetricsMap.set(a.value.title, a.value.title);
+          }
+        }
+
+        const hefs = a.effectiveEmbedmentDepths || [];
+        hefs.forEach((h) => {
+          Object.values(h).forEach((prop) => {
+            if (
+              prop &&
+              prop.constructor &&
+              prop.constructor.name === "Parameter" &&
+              prop.title
+            ) {
+              if (!dynamicFullMetricsMap.has(prop.title)) {
+                dynamicFullMetricsMap.set(prop.title, prop.title);
+              }
+            }
+          });
+        });
+      });
+
+      this.rowMetrics = Array.from(dynamicFullMetricsMap.keys()).map(
+        (title) => ({
+          label: title,
+          key: title,
+        }),
+      );
     }
 
     // Title - removed per user request
@@ -77,10 +218,9 @@ class TableView {
     wrapper.className = "table-scroll";
 
     const table = document.createElement("table");
-    const thead = document.createElement("thead");
 
     // Build columns data (each combination becomes a column)
-    const columns = this.buildColumns(data, filter);
+    const columns = this.buildColumns(data, filter, compactMode);
 
     // Apply sorting
     if (this.sortColumn !== -1) {
@@ -93,184 +233,232 @@ class TableView {
     const start = (this.currentPage - 1) * this.PAGE_SIZE;
     const pagedColumns = columns.slice(start, start + this.PAGE_SIZE);
 
-    // Header row 1: Company names with colspan
-    const companyRow = document.createElement("tr");
-    const emptyTh1 = document.createElement("th");
-    emptyTh1.textContent = "Manufacturer Name";
-    emptyTh1.className = "metric-header";
-    companyRow.appendChild(emptyTh1);
-
-    // Group consecutive columns by company
-    const companyGroups = this.groupByField(pagedColumns, "company");
-    companyGroups.forEach((group) => {
-      const th = document.createElement("th");
-      th.textContent = group.value || "N/A";
-      th.colSpan = group.count;
-      companyRow.appendChild(th);
-    });
-    thead.appendChild(companyRow);
-
-    // Header row 2: Product names with colspan
-    const productRow = document.createElement("tr");
-    const emptyTh2 = document.createElement("th");
-    emptyTh2.textContent = "Product";
-    emptyTh2.className = "metric-header";
-    productRow.appendChild(emptyTh2);
-
-    // Group consecutive columns by product
-    const productGroups = this.groupByField(pagedColumns, "product");
-    productGroups.forEach((group) => {
-      const th = document.createElement("th");
-      th.textContent = group.value || "N/A";
-      th.colSpan = group.count;
-      productRow.appendChild(th);
-    });
-    thead.appendChild(productRow);
-    table.appendChild(thead);
-
-    // Body - each row is a metric
+    // Single tbody — no thead, everything is a plain td row
     const tbody = document.createElement("tbody");
-    this.rowMetrics.forEach((metric, metricIdx) => {
+
+    // ── Group 1: Product Information ─────────────────────────
+    const addGroupHeader = (label) => {
+      const groupRow = document.createElement("tr");
+      groupRow.className = "group-header-row";
+      const groupTd = document.createElement("td");
+      groupTd.colSpan = pagedColumns.length + 1;
+      groupTd.className = "group-header-cell";
+      groupTd.textContent = label;
+      groupRow.appendChild(groupTd);
+      tbody.appendChild(groupRow);
+    };
+
+    const addInfoRow = (title, field) => {
       const row = document.createElement("tr");
-
-      // Metric label (first column) - clickable for sorting
       const labelTd = document.createElement("td");
-      labelTd.innerHTML = metric.label;
-      labelTd.className = "metric-label";
-      labelTd.style.fontWeight = "bold";
-      labelTd.style.cursor = "pointer";
-      labelTd.title = "Click to sort columns by this metric";
-      if (this.sortColumn === metricIdx) {
-        labelTd.innerHTML += this.sortAscending ? " ▲" : " ▼";
-      }
-      labelTd.addEventListener("click", () => this.onSort(metricIdx));
+      labelTd.textContent = title;
+      labelTd.className = "metric-header metric-label";
       row.appendChild(labelTd);
-
-      // Data cells for each column
-      pagedColumns.forEach((col) => {
+      this.groupByField(pagedColumns, field).forEach((group) => {
         const td = document.createElement("td");
-        // Use plain text for data-label (remove HTML tags)
-        const plainLabel = metric.label.replace(/<[^>]*>/g, "");
-        td.setAttribute("data-label", plainLabel);
-        td.textContent = col.values[metric.key] || "-";
+        td.textContent = group.value || "-";
+        td.colSpan = group.count;
         row.appendChild(td);
       });
-
       tbody.appendChild(row);
+    };
+
+    addGroupHeader("Product Information");
+    addInfoRow(data.company.title, "company");
+    addInfoRow(data.name.title, "product");
+    addInfoRow(data.material.title, "material");
+    addInfoRow(data.evaluationReport.title, "evaluationReport");
+    addInfoRow(data.dateIssued.title, "dateIssued");
+    addInfoRow(data.dateExpires.title, "dateExpires");
+
+    // ── Groups 2+: metric sections (General, Tension, Shear …) ──
+    const categoriesMap = new Map();
+    this.rowMetrics.forEach((metric, metricIdx) => {
+      const cat = this.getMetricCategory(metric.label);
+      if (!categoriesMap.has(cat)) categoriesMap.set(cat, []);
+      categoriesMap.get(cat).push({ metric, metricIdx });
     });
+
+    categoriesMap.forEach((items, categoryName) => {
+      addGroupHeader(categoryName);
+
+      items.forEach(({ metric, metricIdx }) => {
+        const row = document.createElement("tr");
+
+        const metricKeyLower = (metric.key || metric.label || "").toLowerCase();
+        if (metricKeyLower.includes("anchor size")) {
+          row.classList.add("frozen-row-1");
+        } else if (metricKeyLower.includes("effective embedment depth")) {
+          row.classList.add("frozen-row-2");
+        }
+
+        // First column — metric label
+        const labelTd = document.createElement("td");
+        labelTd.innerHTML = this.formatLabelWithSubscripts(metric.label);
+        labelTd.className = "metric-header metric-label";
+        labelTd.style.cursor = "pointer";
+        labelTd.title = "Click to sort columns by this metric";
+        if (this.sortColumn === metricIdx) {
+          labelTd.innerHTML += this.sortAscending ? " ▲" : " ▼";
+        }
+        labelTd.addEventListener("click", () => this.onSort(metricIdx));
+        row.appendChild(labelTd);
+
+        // Data cells (merge adjacent for Head Type)
+        const isHeadType =
+          metric.key && metric.key.toLowerCase().includes("head type");
+        if (isHeadType) {
+          const groups = this.groupByMetricValue(pagedColumns, metric.key);
+          groups.forEach((group) => {
+            const td = document.createElement("td");
+            const plainLabel = metric.label.replace(/<[^>]*>/g, "");
+            td.setAttribute("data-label", plainLabel);
+            td.textContent = group.value || "-";
+            if (group.count > 1) td.colSpan = group.count;
+            row.appendChild(td);
+          });
+        } else {
+          pagedColumns.forEach((col) => {
+            const td = document.createElement("td");
+            const plainLabel = metric.label.replace(/<[^>]*>/g, "");
+            td.setAttribute("data-label", plainLabel);
+            td.textContent = col.values[metric.key] || "-";
+            row.appendChild(td);
+          });
+        }
+
+        tbody.appendChild(row);
+      });
+    });
+
     table.appendChild(tbody);
 
     // Column count - removed per user request
     wrapper.appendChild(table);
     this.container.appendChild(wrapper);
 
+    // Measure frozen row 1 height to align frozen row 2 perfectly beneath it
+    requestAnimationFrame(() => {
+      const row1 = table.querySelector(".frozen-row-1");
+      if (row1) {
+        const h = row1.offsetHeight;
+        if (h > 0) {
+          table.style.setProperty("--frozen-row-1-height", `${h}px`);
+        }
+      }
+    });
+
     // Pagination controls
     if (columns.length > this.PAGE_SIZE) {
       this.renderPagination(totalPages);
     }
+
+    // Re-apply in-table search if active
+    if (this.searchTerm) {
+      this.findMatches(this.searchTerm, false);
+    }
   }
 
   /**
-   * Build table columns from data (transposed structure)
+   * Extract data into a flat array of columns
    */
-  buildColumns(data, filter) {
+  buildColumns(data, filter, compactMode) {
     const columns = [];
-    const normalizedFilter = this.model.normalizeKey(filter || "");
-    const company = data.company || "Unknown";
-    const product = data.name || "Unknown";
+    const normalizedFilter = this.model.normalizeKey(filter);
+    const company = data.company?.value || data.company || "Unknown";
+    const product = data.name?.value || data.name || "Unknown";
+    const material = data.material?.value || data.material || "-";
+    const anchorType = data.anchorType?.value || data.anchorType || "-";
+    const evaluationReport =
+      data.evaluationReport?.value || data.evaluationReport || "-";
+    const dateIssued = data.dateIssued?.value || data.dateIssued || "-";
+    const dateExpires = data.dateExpires?.value || data.dateExpires || "-";
 
     const anchorSizes = data.anchorSizes || [];
 
     anchorSizes.forEach((a) => {
-      const anchorSizeData = a["Anchor Size"] || a.anchorSize || a || {};
-      const anchorSize =
-        anchorSizeData.value ||
-        anchorSizeData["value"] ||
-        anchorSizeData.anchorSize ||
-        "n/a";
-      const drillBit =
-        anchorSizeData["Drill Bit Diameter"] || anchorSizeData.drill || "-";
-      const hefs = anchorSizeData["Effective Embedment Depth (hef)"] || [];
+      const anchorSize = a.value || "n/a";
+      const drillBit = a.drillBitDiameter?.value || "-";
+      const hefs = a.effectiveEmbedmentDepths || [];
 
       hefs.forEach((h) => {
-        // Extract all values for this combination
-        const values = {
-          anchorSize: anchorSize,
-          drillBit: drillBit,
-          hef: this.model.formatNumber(h.value),
-          hnom: this.model.formatNumber(
-            h["Nominal Embedment Depth (hnom)"] || h.hnom,
-          ),
-          hhole: this.model.formatNumber(
-            h["Minimum Hole Depth (hhole)"] || h.hhole,
-          ),
-          cracked: h["Cracked Concrete Data"] ? "yes" : "no",
-          seismic: h["Seismic Categories"] || h.Seismic || "-",
-          category: h["Anchor Category"] || h.Anchor || "-",
-          φNsa: this.model.formatNumber(
-            this.model.getField(h, [
-              "Tension Steel Strength (φNsa)",
-              "tensionSteelStrength",
-              "φNsa",
-              "ϕNsa",
-            ]),
-          ),
-          φNcb: this.model.formatNumber(
-            this.model.getField(h, [
-              "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)",
-              "φNcb",
-              "ϕNcb",
-            ]),
-          ),
-          φNcb_cr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Tension Breakout Strength - Cracked Concrete (φNcb,cr)",
-              "φNcb_cr",
-              "φNcb,cr",
-            ]),
-          ),
-          φNp_uncr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Pullout Strength - Uncracked Concrete (φNp,uncr)",
-              "φNp",
-              "ϕNp",
-            ]),
-          ),
-          φNp_cr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Pullout Strength - Cracked Concrete (φNp,cr)",
-              "φNp_cr",
-              "φNp,cr",
-            ]),
-          ),
-          φVsa: this.model.formatNumber(
-            this.model.getField(h, [
-              "Shear Steel Strength (φVsa)",
-              "shearSteelStrength",
-              "φVsa",
-              "ϕVsa",
-            ]),
-          ),
-          φVcp_uncr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Pryout Strength - Uncracked Concrete (φVcp,uncr)",
-              "φVcp",
-              "φVcp_uncr",
-            ]),
-          ),
-          φVcp_cr: this.model.formatNumber(
-            this.model.getField(h, [
-              "Pryout Strength - Cracked Concrete (φVcp,cr)",
-              "φVcp_cr",
-              "φVcp,cr",
-            ]),
-          ),
-        };
+        let values = {};
+
+        const paramLookup = new Map();
+
+        // Product parameters
+        Object.values(data).forEach((prop) => {
+          if (
+            prop &&
+            prop.constructor &&
+            prop.constructor.name === "Parameter" &&
+            prop.title
+          ) {
+            paramLookup.set(prop.title, prop.value);
+          }
+        });
+
+        // AnchorSize parameter
+        if (
+          a.value &&
+          a.value.constructor &&
+          a.value.constructor.name === "Parameter" &&
+          a.value.title
+        ) {
+          paramLookup.set(a.value.title, a.value.value);
+        }
+
+        // EffectiveEmbedmentDepth parameters
+        Object.values(h).forEach((prop) => {
+          if (
+            prop &&
+            prop.constructor &&
+            prop.constructor.name === "Parameter" &&
+            prop.title
+          ) {
+            paramLookup.set(prop.title, prop.value);
+          }
+        });
+
+        this.rowMetrics.forEach((metric) => {
+          let rawVal = paramLookup.get(metric.label);
+          if (typeof rawVal === "boolean") {
+            rawVal = rawVal ? "yes" : "no";
+          }
+
+          if (rawVal === null || rawVal === undefined) {
+            rawVal = "-";
+          }
+
+          values[metric.key] =
+            typeof rawVal === "number" ||
+              (!isNaN(rawVal) &&
+                rawVal !== "-" &&
+                rawVal !== "yes" &&
+                rawVal !== "no" &&
+                String(rawVal).trim() !== "")
+              ? this.model.formatNumber(rawVal)
+              : rawVal;
+        });
 
         // Filter check - search across all values
         if (normalizedFilter) {
           const columnText = this.model.normalizeKey(
-            company + " " + product + " " + Object.values(values).join(" "),
+            company +
+            " " +
+            product +
+            " " +
+            material +
+            " " +
+            anchorType +
+            " " +
+            evaluationReport +
+            " " +
+            dateIssued +
+            " " +
+            dateExpires +
+            " " +
+            Object.values(values).join(" "),
           );
           if (!columnText.includes(normalizedFilter)) return;
         }
@@ -278,6 +466,11 @@ class TableView {
         columns.push({
           company: company,
           product: product,
+          material: material,
+          anchorType: anchorType,
+          evaluationReport: evaluationReport,
+          dateIssued: dateIssued,
+          dateExpires: dateExpires,
           values: values,
         });
       });
@@ -332,6 +525,31 @@ class TableView {
     // Push the last group
     groups.push({ value: currentValue, count: count });
 
+    return groups;
+  }
+
+  /**
+   * Group consecutive columns by values[metricKey] (for colspan merging in body rows)
+   */
+  groupByMetricValue(columns, metricKey) {
+    if (!columns || columns.length === 0) return [];
+
+    const groups = [];
+    let currentValue = columns[0].values?.[metricKey];
+    let count = 1;
+
+    for (let i = 1; i < columns.length; i++) {
+      const val = columns[i].values?.[metricKey];
+      if (val === currentValue) {
+        count++;
+      } else {
+        groups.push({ value: currentValue, count: count });
+        currentValue = val;
+        count = 1;
+      }
+    }
+
+    groups.push({ value: currentValue, count: count });
     return groups;
   }
 
@@ -391,5 +609,225 @@ class TableView {
 
   onNextPage() {
     // Placeholder - will be set by controller
+  }
+
+  /**
+   * Search across both row header and value cells in all rows
+   */
+  findMatches(searchTerm, resetIndex = true) {
+    this.searchTerm = (searchTerm || "").trim().toLowerCase();
+    this.matches = [];
+    this.clearSearchHighlights();
+
+    if (!this.searchTerm) {
+      this.currentMatchIndex = -1;
+      if (this.onSearchMatchChange) {
+        this.onSearchMatchChange({ current: 0, total: 0, query: "" });
+      }
+      return;
+    }
+
+    const rows = this.container.querySelectorAll("tbody tr:not(.group-header-row)");
+    rows.forEach((row) => {
+      const cells = Array.from(row.querySelectorAll("td"));
+      const matchingCells = [];
+
+      cells.forEach((cell) => {
+        const text = (cell.textContent || "").toLowerCase();
+        if (text.includes(this.searchTerm)) {
+          matchingCells.push(cell);
+        }
+      });
+
+      if (matchingCells.length > 0) {
+        row.classList.add("search-match-row");
+        this.matches.push({ row, matchingCells });
+      }
+    });
+
+    if (this.matches.length > 0) {
+      const targetIndex = resetIndex
+        ? 0
+        : Math.min(Math.max(0, this.currentMatchIndex), this.matches.length - 1);
+      this.goToMatch(targetIndex);
+    } else {
+      this.currentMatchIndex = -1;
+      if (this.onSearchMatchChange) {
+        this.onSearchMatchChange({ current: 0, total: 0, query: this.searchTerm });
+      }
+    }
+  }
+
+  /**
+   * Cycle to a specific match index and scroll into view smoothly
+   */
+  goToMatch(index) {
+    if (this.matches.length === 0) return;
+
+    // Remove active highlight from previous match
+    if (this.currentMatchIndex >= 0 && this.matches[this.currentMatchIndex]) {
+      const prev = this.matches[this.currentMatchIndex];
+      prev.row.classList.remove("search-match-active", "search-match-flash");
+      prev.matchingCells.forEach((c) =>
+        c.classList.remove("search-match-cell", "search-match-cell-flash"),
+      );
+    }
+
+    // Wrap around index for cycling
+    this.currentMatchIndex = (index + this.matches.length) % this.matches.length;
+    const current = this.matches[this.currentMatchIndex];
+
+    // Add persistent active highlight to row and matching cells
+    current.row.classList.add("search-match-active");
+    current.matchingCells.forEach((c) => c.classList.add("search-match-cell"));
+
+    // Add temporary pulse highlight class (reflow ensures animation restarts on each navigation)
+    current.row.classList.remove("search-match-flash");
+    void current.row.offsetWidth;
+    current.row.classList.add("search-match-flash");
+
+    current.matchingCells.forEach((c) => {
+      c.classList.remove("search-match-cell-flash");
+      void c.offsetWidth;
+      c.classList.add("search-match-cell-flash");
+    });
+
+    if (this.flashTimeout) clearTimeout(this.flashTimeout);
+    this.flashTimeout = setTimeout(() => {
+      current.row.classList.remove("search-match-flash");
+      current.matchingCells.forEach((c) =>
+        c.classList.remove("search-match-cell-flash"),
+      );
+    }, 3000);
+
+    // Play subtle chime sound feedback on jump
+    this.playJumpSound();
+
+    // Scroll smoothly into view
+    current.row.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    // If there is a matching data cell that might be horizontally scrolled out, ensure horizontal visibility
+    const valueCell = current.matchingCells.find(
+      (c) => !c.classList.contains("metric-label"),
+    );
+    if (valueCell) {
+      valueCell.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "nearest",
+      });
+    }
+
+    if (this.onSearchMatchChange) {
+      this.onSearchMatchChange({
+        current: this.currentMatchIndex + 1,
+        total: this.matches.length,
+        query: this.searchTerm,
+      });
+    }
+  }
+
+  /**
+   * Go to next match
+   */
+  nextMatch() {
+    if (this.matches.length === 0) return;
+    this.goToMatch(this.currentMatchIndex + 1);
+  }
+
+  /**
+   * Go to previous match
+   */
+  prevMatch() {
+    if (this.matches.length === 0) return;
+    this.goToMatch(this.currentMatchIndex - 1);
+  }
+
+  /**
+   * Remove all search highlight classes
+   */
+  clearSearchHighlights() {
+    if (this.flashTimeout) {
+      clearTimeout(this.flashTimeout);
+      this.flashTimeout = null;
+    }
+
+    const activeRows = this.container.querySelectorAll(
+      ".search-match-row, .search-match-active, .search-match-flash",
+    );
+    activeRows.forEach((r) =>
+      r.classList.remove(
+        "search-match-row",
+        "search-match-active",
+        "search-match-flash",
+      ),
+    );
+
+    const activeCells = this.container.querySelectorAll(
+      ".search-match-cell, .search-match-cell-flash",
+    );
+    activeCells.forEach((c) =>
+      c.classList.remove("search-match-cell", "search-match-cell-flash"),
+    );
+  }
+
+  /**
+   * Reset search state and highlights
+   */
+  clearSearch() {
+    this.searchTerm = "";
+    this.matches = [];
+    this.currentMatchIndex = -1;
+    this.clearSearchHighlights();
+    if (this.onSearchMatchChange) {
+      this.onSearchMatchChange({ current: 0, total: 0, query: "" });
+    }
+  }
+
+  /**
+   * Play subtle, clean chime audio feedback when jumping to a search match
+   */
+  playJumpSound() {
+    if (!this.soundEnabled) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!this.audioCtx) {
+        this.audioCtx = new AudioCtx();
+      }
+      if (this.audioCtx.state === "suspended") {
+        this.audioCtx.resume();
+      }
+
+      const now = this.audioCtx.currentTime;
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+
+      // Soft water-drop / chime sine wave (520Hz -> 780Hz)
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(780, now + 0.08);
+
+      // Gentle non-intrusive exponential volume envelope
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.08, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.13);
+    } catch (e) {
+      // Audio playback silently ignored if browser denies audio
+    }
+  }
+
+  /**
+   * Toggle search audio feedback on/off
+   */
+  toggleSound() {
+    this.soundEnabled = !this.soundEnabled;
+    return this.soundEnabled;
   }
 }
